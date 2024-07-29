@@ -8,10 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
     use HasFactory;
-    protected $fillable = ['author','email','comment','post_id'];
+    protected $fillable = ['body','user_id','post_id'];
 
     public function post()
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function replies(){
+        return $this->hasMany(Reply::class);
     }
 }

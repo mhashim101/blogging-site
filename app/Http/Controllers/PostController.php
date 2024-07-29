@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Reply;
+use App\Models\Comment;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,11 +48,10 @@ class PostController extends Controller
             'title' => 'required|string',
             'description' => 'required|string',
             'user_id' => 'required|numeric',
-            'category_id' => 'nullable|numeric',
+            'category_id' => 'nullable',
             'comment_id' => 'nullable',
             'image' => 'nullable|image', // Assuming 'image' is a file upload field
         ]);
-
         
         // Initialize $imagePath variable
         $imagePath = null;
@@ -88,11 +89,9 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::with('user')->find($id);
-
-        // Return the view with the post data
+        $post = Post::with('user','comment.user','comment.replies.user')->find($id);
+        // return $post;
         return view('viewpost', compact('post'));
-        // return $posts;
     }
 
     /**
@@ -199,4 +198,22 @@ class PostController extends Controller
         $post->delete();
         return redirect()->route('post.index')->with('success','Post Successfully Deleted!');
     }
+
+    // Like Function
+    public function toggleLike(Post $post)
+    {
+        $user = auth()->user();
+        
+        if ($post->like()->where('user_id', $user->id)->exists()) {
+            $post->like()->where('user_id', $user->id)->delete();
+            $message = 'Post unliked successfully.';
+        } else {
+            $post->like()->create(['user_id' => $user->id]);
+            $message = 'Post liked successfully.';
+        }
+        
+        return response()->json(['message' => $message]);
+    }
+
+
 }

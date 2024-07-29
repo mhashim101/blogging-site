@@ -27,28 +27,19 @@ class UserController extends Controller
             return redirect()->route('dashboard');
         }
     }
-    // Homepage of site
-    public function showPostBlogPage(){
-        if(Auth::guest()){
-            // $post = Post::with('user','category')->where('id',$id)->get();
-            return view('Home.postblog');
-        }else{
-            return redirect()->route('dashboard');
-        }
-    }
-    // Homepage of site
+   
+
     public function showBlogPosts($id){
         if(Auth::guest()){
-            $posts = Post::with('user','category')->where('id',$id)->get();
-            $comments = Comment::where('post_id',$id)->get();
-            if($comments){
-                return view('Home.postblog',compact(['posts','comments']));
-            }
+            $posts = Post::with('user','category','comment.user','comment.replies.user')->find($id);
+            // return $posts;
             return view('Home.postblog',compact('posts'));
         }else{
             return redirect()->route('dashboard');
         }
     }
+
+
      // Show registration form
      public function showRegistrationForm()
      {  

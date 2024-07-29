@@ -5,10 +5,11 @@ use App\Http\Middleware\NotLoggedIn;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\EmailVerificationController;
 use App\Http\Middleware\EnsureEmailIsVerified;
+use App\Http\Controllers\EmailVerificationController;
 
 Route::view('verifyemail','/verifyemail')->name('verifyemail');
 // Route::view('emails/notverified','/notverified')->name('notverifyemail');
@@ -22,6 +23,7 @@ Route::get('/emails/verify/{token}', [EmailVerificationController::class, 'verif
 // UserController
 Route::middleware(['ok-user'])->group(function(){
 
+    //User Controller
     Route::controller(UserController::class)->group(function(){
 
         Route::get('/addpost','addPostPage')->name('addpost');
@@ -40,8 +42,23 @@ Route::middleware(['ok-user'])->group(function(){
     
     });
 
+
+
+    
 });
 
+//Comment Controller
+Route::controller(CommentController::class)->group(function(){
+    Route::post('/comment','store')->name('storeComment');
+    Route::get('/show/{id}','show')->name('showComment');
+});
+
+
+// ReplyController
+
+Route::controller(ReplyController::class)->group(function(){
+    Route::post('/reply','storeReply')->name('storeReply');
+});
 
 
 // UserController
@@ -49,7 +66,7 @@ Route::controller(UserController::class)->group(function(){
 
     Route::get('/','showLoginForm')->name('loginPage');
     Route::get('/homepage','showHomePage')->name('homepage');
-    Route::get('/homepage/postblog/','showPostBlogPage')->name('postblog');
+    // Route::get('/homepage/postblog/','showPostBlogPage')->name('postblog');
     Route::get('/blogposts/{id}','showBlogPosts')->name('blogposts');
     Route::get('/register','showRegistrationForm')->name('registerPage');
     Route::post('/registerUser','register')->name('registerUser');
@@ -61,14 +78,18 @@ Route::controller(UserController::class)->group(function(){
 
 
 // CommentController
-Route::controller(CommentController::class)->group(function(){
-    Route::post('/pushComment','pushComment')->name('pushComment');
+// Route::controller(CommentController::class)->group(function(){
+//     Route::post('/pushComment','pushComment')->name('pushComment');
 
-    Route::middleware([ValidUser::class])->group(function(){
-        Route::get('/comments','showComments')->name('comments');
-        Route::delete('/destroyComment/{id}','destroyComment')->name('destroyComment');
-    });
-});
+//     Route::middleware([ValidUser::class])->group(function(){
+//         Route::get('/comments','showComments')->name('comments');
+//         Route::delete('/destroyComment/{id}','destroyComment')->name('destroyComment');
+//     });
+// });
+
+
+
+
 
 
 // PostController
@@ -81,6 +102,7 @@ Route::controller(PostController::class)->group(function(){
 
 })->middleware(ValidUser::class);
 
+// Route::post('/posts/{post}/like', [PostController::class, 'toggleLike'])->middleware('auth');
 
 
 
@@ -91,6 +113,7 @@ Route::controller(GoogleController::class)->group(function(){
     Route::get('auth/google/callback','handleGoogleCallback')->name('auth.google.callback');
 
 });
+
 
 
 

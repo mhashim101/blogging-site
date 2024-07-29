@@ -24,13 +24,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmailVerificationToken::class);
     }
-    
 
-    // public function hasVerifiedEmail()
-    // {
-    //     return !is_null($this->email_verified_at);
-    // }
-
+ 
     protected $fillable = [
         'name',
         'email',

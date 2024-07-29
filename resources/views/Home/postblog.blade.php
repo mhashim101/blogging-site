@@ -12,26 +12,26 @@
         <div class="col-lg-8">
             <!-- Post content-->
             @isset($posts)
-                @foreach ($posts as $key => $value )
+                {{-- @foreach ($posts as $value) --}}
                     <article>
                         <!-- Post header-->
                         <header class="mb-4">
                             <!-- Post title-->
-                            <h1 class="fw-bolder mb-1">{{$value->title}}</h1>
+                            <h1 class="fw-bolder mb-1">{{$posts->title}}</h1>
                             <!-- Post meta content-->
-                            <div class="text-muted fst-italic mb-2">Posted on {{$value->created_at->format('g:i A')}}</div>
+                            <div class="text-muted fst-italic mb-2">Posted on {{$posts->created_at->format('g:i A')}}</div>
                             <!-- Post categories-->
-                            <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{$value->category->name}}</a>
+                            <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{$posts->category->name}}</a>
                             {{-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> --}}
                         </header>
                         <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="{{asset($value->image)}}" alt="..." /></figure>
+                        <figure class="mb-4"><img class="img-fluid rounded" src="{{asset($posts->image)}}" alt="..." /></figure>
                         <!-- Post content-->
                         <section class="mb-5">
-                            <p class="fs-5 mb-4">{{$value->description}}</p>
+                            <p class="fs-5 mb-4">{{$posts->description}}</p>
                         </section>
                     </article>
-                @endforeach
+                {{-- @endforeach --}}
             @else
                 <article>
                     <!-- Post header-->
@@ -63,10 +63,97 @@
                 <div class="card bg-light">
                     <div class="card-body">
                         <!-- Comment form-->
-                        <form action="{{route('pushComment')}}" method="post" class="mb-4">
+
+                        <div class="row d-flex justify-content-around text-align-center"> 
+                            <div class="col-m-12">
+                                <div class="comment-section" style="overflow-y: scroll; height: 400px;">
+                                    <div class="comment" id="comment-1">
+                                        @isset($posts)
+                                            
+                                            @foreach ($posts->comment as $comment)
+                                                <div class="comment-user">{{$comment->user->name}}</div>
+                                                <div class="comment-text">{{$comment->body}}</div>
+                                                @if (Auth::check() && Auth::user()->role === 'user')
+                                                    <div class="comment-actions">
+                                                        <button class="reply-btn" onclick="toggleReplyForm('reply-form-{{$comment->id}}')">Reply</button>
+                                                    </div>    
+                                                    <div class="reply-form" id="reply-form-{{$comment->id}}">
+                                                        <form action="{{route('storeReply')}}" method="POST">
+                                                            @csrf
+                                                            <input type="hidden" placeholder="Write a reply..." class="reply-input" name="comment_id" value="{{$comment->id}}">
+                                                            {{-- @isset() --}}
+                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id"> 
+                                                            {{-- @endisset --}}
+                                                            <input type="hidden" placeholder="Write a reply..." class="reply-input" name="post_id" value="{{$comment->post_id}}">
+                                                            <input type="text" placeholder="Write a reply..." class="reply-input" name="body">
+                                                            <button type="submit" class="send-reply-btn" >Send</button>
+                                                        </form>
+                                                    </div>
+                                                @endif
+                                                @foreach ($comment->replies as $reply)
+                                                    @if ($comment->id === $reply->comment_id)
+                                                        <div class="replies" id="replies-comment-1">
+                                                            <div class="reply" id="comment-1-{{$reply->id}}">
+                                                                <div class="comment-user">{{$reply->user->name}}</div>
+                                                                <div class="comment-text">{{$reply->body}}</div>
+                                                                @if (Auth::check() && Auth::user()->role === 'user')
+                                                                    <div class="comment-actions">
+                                                                        <button class="reply-btn" onclick="toggleReplyForm('reply-form-comment-1-{{$reply->id}}')">Reply</button>
+                                                                    </div>                                                                                                                         
+                                                                    <div class="replies" id="replies-comment-1-{{$reply->id}}">
+                                                                        <div class="reply-form" id="reply-form-comment-1-{{$reply->id}}">
+                                                                            {{-- Form --}}
+                                                                            <form action="{{route('storeReply')}}" method="post">
+                                                                                @csrf
+                                                                                <input type="text" placeholder="Write a reply..." class="reply-input" name="body">
+                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="user_id">
+                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="post_id" value="{{$comment->post_id}}">
+                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="comment_id" value="{{$reply->comment_id}}">
+                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id" {{$reply->id}}>
+                                                                                <button type="submit" class="send-reply-btn" >Send</button>
+                                                                            </form>
+                                                                            {{-- End Form --}}
+                                                                            {{-- <button class="send-reply-btn" onclick="sendReply('comment-1-{{$reply->id}}', 'reply-form-comment-1-{{$reply->id}}')">Send</button> --}}
+                                                                        </div>
+                                                                    </div>
+                                                                @endif    
+                                                            </div>
+                                                        </div>
+                                                    
+                                                    @endif
+                                                @endforeach
+                                            @endforeach
+                                        @else
+                                            <div class="comment-user">User</div>
+                                            <div class="comment-text">No comments</div>
+                                        @endisset
+                                    </div>
+                            
+                                </div>
+                                <!-- New Comment Form -->
+                                @if (Auth::check() && Auth::user()->role === 'user')
+                                    <div class="comment-form">
+                                        <form action="{{route('storeComment')}}" method="post">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <input type="hidden" name="user_id" value="{{$posts->user->id}}">
+                                                    <input type="hidden" name="post_id" value="{{$posts->id}}">
+                                                    <input type="text" id="new-comment-input" placeholder="Write a comment..." class="reply-input w-100" name="body">           
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="submit" class="send-reply-btn w-100">Send</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        {{-- <form action="" method="post" class="mb-4">
                             @csrf
                             <div class="mb-3">
-                                {{-- <label for="username" class="form-label">ress</label> --}}
+                               
                                 @isset($posts)
                                 @foreach ($posts as $key => $value)
                                     
@@ -76,7 +163,7 @@
                                 <input type="text" class="form-control" id="username" placeholder="Name" name="author">
                             </div>
                             <div class="mb-3">
-                                {{-- <label for="useremail" class="form-label">Email address</label> --}}
+                              
                                 <input type="email" class="form-control" id="useremail" placeholder="Email" name="email">
                             </div>
                             <div class="mb-3">
@@ -85,8 +172,8 @@
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-dark">Post a Comment</button>
                             </div>
-                        </form>
-                        <hr>
+                        </form> --}}
+                        {{-- <hr> --}}
                         <!-- Comment with nested comments-->
                         {{-- <div class="d-flex mb-4">
                             <!-- Parent comment-->
@@ -113,7 +200,7 @@
                             </div>
                         </div> --}}
                         <!-- Single comment-->
-                        @isset($comments)
+                        {{-- @isset($comments)
                             @foreach ($comments as $comment)
                                 <div class="d-flex">
                                     <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
@@ -132,7 +219,7 @@
                                     When I look at the universe and all the ways the universe wants to kill us, I find it hard to reconcile that with statements of beneficence.
                                 </div>
                             </div>
-                        @endisset
+                        @endisset --}}
                     </div>
                 </div>
             </section>
