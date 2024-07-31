@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Middleware\ValidUser;
-use App\Http\Middleware\NotLoggedIn;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\CommentController;
-use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Controllers\EmailVerificationController;
+
+
+
 
 Route::view('verifyemail','/verifyemail')->name('verifyemail');
 // Route::view('emails/notverified','/notverified')->name('notverifyemail');
@@ -42,16 +42,18 @@ Route::middleware(['ok-user'])->group(function(){
     
     });
 
-
-
     
+    Route::get('/showComments',[CommentController::class,'showComments'])->name('showComments');
 });
 
 //Comment Controller
 Route::controller(CommentController::class)->group(function(){
     Route::post('/comment','store')->name('storeComment');
-    Route::get('/show/{id}','show')->name('showComment');
+    Route::post('/update','update')->name('updateComment');
+    Route::get('/delete/{id}','destroy')->name('deleteComment');
+    
 });
+
 
 
 // ReplyController
@@ -66,12 +68,12 @@ Route::controller(UserController::class)->group(function(){
 
     Route::get('/','showLoginForm')->name('loginPage');
     Route::get('/homepage','showHomePage')->name('homepage');
-    // Route::get('/homepage/postblog/','showPostBlogPage')->name('postblog');
     Route::get('/blogposts/{id}','showBlogPosts')->name('blogposts');
     Route::get('/register','showRegistrationForm')->name('registerPage');
     Route::post('/registerUser','register')->name('registerUser');
     Route::post('/loginMatch','login')->name('loginMatch');
     Route::get('/logoutUser','logout')->name('logoutUser');
+    Route::get('/postbycategory/{name}','postByCategory')->name('postByCategory');
 
 });
 
@@ -93,15 +95,18 @@ Route::controller(UserController::class)->group(function(){
 
 
 // PostController
-Route::controller(PostController::class)->group(function(){
+Route::middleware('ok-user')->group(function(){
 
-    Route::get('/showPostById','showPostById')->name('showPostById');
-    Route::get('/showPostOnDelete','showPostOnDelete')->name('showPostOnDelete');
-    Route::delete('/destroyById','destroyById')->name('destroyById');
-    Route::resource('post', PostController::class);
-
-})->middleware(ValidUser::class);
-
+    Route::controller(PostController::class)->group(function(){
+        
+        Route::get('/showPostById','showPostById')->name('showPostById');
+        Route::get('/showPostOnDelete','showPostOnDelete')->name('showPostOnDelete');
+        Route::delete('/destroyById','destroyById')->name('destroyById');
+        Route::resource('post', PostController::class);
+        
+    });
+    
+});
 // Route::post('/posts/{post}/like', [PostController::class, 'toggleLike'])->middleware('auth');
 
 

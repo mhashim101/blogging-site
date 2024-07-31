@@ -16,6 +16,14 @@
         margin-top: 0;
         /* Remove the margin so it aligns properly */
     }
+    .dropdown-menu {
+    min-width: 5rem !important;
+    padding: .5rem 0 !important;
+    font-size: 0.9rem !important;
+}
+.editComment{
+    display: none;
+}
 </style>
 @section('content')
     <div class="container-fluid px-0" style="background-color: #D6EFD8;">
@@ -128,23 +136,61 @@
                                 </div>
                                 <div class="row d-flex justify-content-around text-align-center"> 
                                     <div class="col-m-12">
-                                        <div class="comment-section" style="overflow-y: scroll; height: 400px;">
+                                        <div class="comment-section" style="">
                                             <div class="comment" id="comment-1">
                                                 @isset($post)
                                                     
                                                     @foreach ($post->comment as $comment)
-                                                        <div class="comment-user">{{$comment->user->name}}</div>
-                                                        <div class="comment-text">{{$comment->body}}</div>
+                                                        <div class="row">
+                                                            <div class="col-sm-10">
+                                                                <div id="comment-{{$comment->id}}">
+                                                                    <div class="comment-user">
+                                                                        {{$comment->user->name}}
+                                                                        @if($comment->user->role == 'vendor')
+                                                                        <span class="text-secondary" style="font-size: 12px;">author</span>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div id="comment-text-{{$comment->id}}" class="comment-text">{{$comment->body}}</div>
+                                                                </div>
+                                                                <div id="edit-comment-form-{{$comment->id}}" class="editComment">
+                                                                    <form action="{{route('updateComment')}}" method="post">
+                                                                        @csrf
+                                                                        @method('PUT')
+                                                                        <input type="text" name="body">
+                                                                        <input type="hidden" name="$post_id" value="{{$comment->post_id}}">
+                                                                        <input type="hidden" name="user_id" value="{{$comment->user->id}}">
+                                                                        <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                                                        <button type="submit" class="btn primaryBtn fs-7 btn-sm">Update</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2">
+                                                                <div class="dropdown">
+                                                                    <button style="border: none;" class="bg-white" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    ...
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                                        <li><button class="dropdown-item fs-7" onclick="editComment('edit-comment-form-{{$comment->id}}','comment-{{$comment->id}}','comment-text-{{$comment->id}}')">Edit</button></li>
+                                                                        <li>
+                                                                            <form action="{{route('deleteComment',$comment->id)}}" method="post">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit" class="btn btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">Delete</button>
+                                                                            </form>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="comment-actions">
                                                             <button class="reply-btn" onclick="toggleReplyForm('reply-form-{{$comment->id}}')">Reply</button>
                                                         </div>
+                                                        <hr class="p-0 m-0">
                                                         <div class="reply-form" id="reply-form-{{$comment->id}}">
                                                             <form action="{{route('storeReply')}}" method="POST">
                                                                 @csrf
                                                                 <input type="hidden" placeholder="Write a reply..." class="reply-input" name="comment_id" value="{{$comment->id}}">
-                                                                {{-- @isset() --}}
-                                                                    <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id"> 
-                                                                {{-- @endisset --}}
+                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id"> 
                                                                 <input type="hidden" placeholder="Write a reply..." class="reply-input" name="post_id" value="{{$comment->post_id}}">
                                                                 <input type="text" placeholder="Write a reply..." class="reply-input" name="body">
                                                                 <button type="submit" class="send-reply-btn" >Send</button>
@@ -158,20 +204,9 @@
                                                                         <div class="comment-text">{{$reply->body}}</div>
                                                                         <div class="comment-actions">
                                                                             <button class="reply-btn" onclick="toggleReplyForm('reply-form-comment-1-{{$reply->id}}')">Reply</button>
-                                                                        </div>
-
-                                                                        {{-- @isset($reply->reply_id)
-
-                                                                            <div class="comment-user">{{$reply->user->name}}</div>
-                                                                            <div class="comment-text">{{$reply->body}}</div>
-                                                                            <div class="comment-actions">
-                                                                                <button class="reply-btn" onclick="toggleReplyForm('reply-form-comment-1-{{$reply->id}}')">Reply</button>
-                                                                            </div>   
-                                                                        @endisset --}}
-
+                                                                        </div>                                                                      
                                                                         <div class="replies" id="replies-comment-1-{{$reply->id}}">
                                                                             <div class="reply-form" id="reply-form-comment-1-{{$reply->id}}">
-                                                                                {{-- Form --}}
                                                                                 <form action="{{route('storeReply')}}" method="post">
                                                                                     @csrf
                                                                                     <input type="text" placeholder="Write a reply..." class="reply-input" name="body">
@@ -181,8 +216,6 @@
                                                                                     <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id" {{$reply->id}}>
                                                                                     <button type="submit" class="send-reply-btn" >Send</button>
                                                                                 </form>
-                                                                                {{-- End Form --}}
-                                                                                {{-- <button class="send-reply-btn" onclick="sendReply('comment-1-{{$reply->id}}', 'reply-form-comment-1-{{$reply->id}}')">Send</button> --}}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -204,7 +237,7 @@
                                                 @csrf
                                                 <div class="row">
                                                     <div class="col-md-10">
-                                                        <input type="hidden" name="user_id" value="{{$post->user->id}}">
+                                                        <input type="hidden" name="user_id" value="{{Auth::user()->id}}">
                                                         <input type="hidden" name="post_id" value="{{$post->id}}">
                                                         <input type="text" id="new-comment-input" placeholder="Write a comment..." class="reply-input w-100" name="body">           
                                                     </div>
@@ -227,6 +260,21 @@
 @endsection
 
 <script>
+function editComment(editForm, commentBox, comment) {
+    const updateCommentForm = document.getElementById(editForm);
+    const targetedCommentBox = document.getElementById(commentBox);
+    const commentText = document.getElementById(comment);
+    const updateCommentFormInput = updateCommentForm.querySelector('input[name="body"]');
+    if (updateCommentForm.style.display === 'none' || updateCommentForm.style.display === '') {
+        targetedCommentBox.style.display = 'none';
+        updateCommentForm.style.display = 'block';
+        updateCommentFormInput.value = commentText.textContent.trim();
+    } else{
+        updateCommentForm.style.display = 'none';
+        targetedCommentBox.style.display = 'block';
+    }
+}
+
 function toggleReplyForm(replyFormId) {
     const replyForm = document.getElementById(replyFormId);
     if (replyForm.style.display === 'none' || replyForm.style.display === '') {
@@ -235,61 +283,5 @@ function toggleReplyForm(replyFormId) {
         replyForm.style.display = 'none';
     }
 }
-
-// function sendReply(parentId, replyFormId) {
-//     const replyForm = document.getElementById(replyFormId);
-//     const replyInput = replyForm.querySelector('.reply-input');
-//     const replyText = replyInput.value;
-
-//     if (replyText.trim() !== '') {
-//         const repliesContainer = document.getElementById(`replies-${parentId}`);
-//         const newReply = document.createElement('div');
-//         newReply.className = 'reply';
-//         const newReplyId = `${parentId}-${Math.random().toString(36).substr(2, 9)}`; // Generate a unique id for new reply
-//         newReply.id = newReplyId;
-//         newReply.innerHTML = `
-//             <div class="comment-user">You</div>
-//             <div class="comment-text">${replyText}</div>
-//             <div class="comment-actions">
-//                 <button class="reply-btn" onclick="toggleReplyForm('reply-form-${newReplyId}')">Reply</button>
-//             </div>
-//             <div class="replies" id="replies-${newReplyId}"></div>
-//             <div class="reply-form" id="reply-form-${newReplyId}">
-//                 <input type="text" placeholder="Write a reply..." class="reply-input">
-//                 <button class="send-reply-btn" onclick="sendReply('${newReplyId}', 'reply-form-${newReplyId}')">Send</button>
-//             </div>
-//         `;
-//         repliesContainer.appendChild(newReply);
-//         replyInput.value = '';
-//         replyForm.style.display = 'none';
-//     }
-// }
-
-// function addComment() {
-//     const commentInput = document.getElementById('new-comment-input');
-//     const commentText = commentInput.value;
-
-//     if (commentText.trim() !== '') {
-//         const newComment = document.createElement('div');
-//         newComment.className = 'comment';
-//         const newCommentId = `comment-${Math.random().toString(36).substr(2, 9)}`; // Generate a unique id for new comment
-//         newComment.id = newCommentId;
-//         newComment.innerHTML = `
-//             <div class="comment-user">You</div>
-//             <div class="comment-text">${commentText}</div>
-//             <div class="comment-actions">
-//                 <button class="reply-btn" onclick="toggleReplyForm('reply-form-${newCommentId}')">Reply</button>
-//             </div>
-//             <div class="replies" id="replies-${newCommentId}"></div>
-//             <div class="reply-form" id="reply-form-${newCommentId}">
-//                 <input type="text" placeholder="Write a reply..." class="reply-input">
-//                 <button class="send-reply-btn" onclick="sendReply('${newCommentId}', 'reply-form-${newCommentId}')">Send</button>
-//             </div>
-//         `;
-//         document.querySelector('.comment-section').appendChild(newComment);
-//         commentInput.value = '';
-//     }
-// }
-
 
 </script>

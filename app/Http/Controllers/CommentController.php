@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
@@ -22,23 +23,53 @@ class CommentController extends Controller
         ]);
 
         if ($comment) {
+            if(Auth::user()->role == 'user'){
+                return redirect()->route('blogposts',$request->post_id);
+            }else{
+                return redirect()->route('post.show',$request->post_id);
+
+            }
+            // $post = Post::with('user','comment.user','comment.replies.user')->find($request->post_id);
             // $post = Post::with('user', 'category', 'comment')->find($request->post_id);
             // $comments = Comment::with('user','post')->where('post_id',$request->post_id)->get();
-            return redirect()->route('blogposts',$request->post_id);
         }
     
         return redirect()->back()->with('error', 'Comment could not be added.');
     }
 
+    public function showComments(){
+        $comments = Comment::with('user','post','replies')->get();
+        return $comments;
+        return view('comments',compact('comments'));
+    }
 
-    // public function show($id){
-    //     $comment = Comment::with('post','user')->findOrFail($id);
-    //     return view('viewpost',compact('comment'));
-    // }
+    public function update(Request $request){
+        $request->validate([
+            'comment_id' => 'required|exists:comments,id',
+            'body' => 'required|string',
+        ]);
+    
+        $comment = Comment::with('user','post')->find($request->comment_id);
+        
+        if ($comment) {
+
+            $comment->body = $request->body;
+            $comment->save();
+            return redirect()->back()->with('message', 'Comment updated successfully.');
+            
+        } else {
+            return redirect()->back()->with('message', 'Comment not found.');
+        }
+    }
 
 
+    public function destroy($id){
+        $comment = Comment::findOrFail($id);
+        $comment->delete();
+        return redirect()->back()->with('message', 'Comment successfully deleted.');
+    }
 
-
+}
 
 
 
@@ -98,4 +129,3 @@ class CommentController extends Controller
     //     $comment->delete();
     //     return redirect()->route('comments')->with('success','Post Successfully Deleted!');
     // }
-}

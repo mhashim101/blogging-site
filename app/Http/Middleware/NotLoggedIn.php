@@ -16,10 +16,12 @@ class NotLoggedIn
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!Auth::guest()){
-            return $next($request);
-        }else{
+
+        if(Auth::guest()){
             return redirect()->route('loginPage');
+        }else{
+            return $next($request);
         }
+
     }
 }

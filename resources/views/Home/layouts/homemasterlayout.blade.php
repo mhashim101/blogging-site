@@ -21,13 +21,25 @@
                 <a class="navbar-brand" href="#!">Hashim Blogs</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex justify-content-center align-items-center">
                         {{-- @yield('active_home') --}}
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('homepage')}}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('registerPage')}}">Sign Up</a></li>
-                        {{-- <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li> --}}
-                        {{-- @yield('active_blog') --}}
+                        @if(Auth::guest())
+                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('registerPage')}}">Sign Up</a></li>
+                        @elseif (Auth::user()->role == 'user')
+                            <li class="nav-item">
+                                <div class="dropdown">
+                                    <button style="border: none;background-color: unset;color: white;" class="dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                      {{Auth::user()->name}}
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        <li>
+                                            <a class="nav-link active text-dark" aria-current="page" href="{{route('logoutUser')}}">Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </div>

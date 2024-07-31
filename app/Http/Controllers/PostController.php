@@ -19,13 +19,12 @@ class PostController extends Controller
     public function index()
     {   
         $user = Auth::user();
-        if($user->role == 'user'){
+        if($user->role == 'vendor'){
             $post = Post::with('user')->where('user_id',$user->id)->get();
             return view('allposts',['post'=>$post]);
         }else{
             $post = Post::with('user')->paginate(4);
             return view('allposts',['post'=>$post]);
-
         }
         
     }
@@ -90,8 +89,8 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::with('user','comment.user','comment.replies.user')->find($id);
-        // return $post;
         return view('viewpost', compact('post'));
+        // return $post;
     }
 
     /**
@@ -200,20 +199,20 @@ class PostController extends Controller
     }
 
     // Like Function
-    public function toggleLike(Post $post)
-    {
-        $user = auth()->user();
+    // public function toggleLike(Post $post)
+    // {
+    //     $user = auth()->user();
         
-        if ($post->like()->where('user_id', $user->id)->exists()) {
-            $post->like()->where('user_id', $user->id)->delete();
-            $message = 'Post unliked successfully.';
-        } else {
-            $post->like()->create(['user_id' => $user->id]);
-            $message = 'Post liked successfully.';
-        }
+    //     if ($post->like()->where('user_id', $user->id)->exists()) {
+    //         $post->like()->where('user_id', $user->id)->delete();
+    //         $message = 'Post unliked successfully.';
+    //     } else {
+    //         $post->like()->create(['user_id' => $user->id]);
+    //         $message = 'Post liked successfully.';
+    //     }
         
-        return response()->json(['message' => $message]);
-    }
+    //     return response()->json(['message' => $message]);
+    // }
 
 
 }

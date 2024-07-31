@@ -51,19 +51,23 @@
             
             <!-- Nested row for non-featured blog posts-->
             <div class="row">
-                @forelse ($posts as $post)
-                    <div class="col-lg-6">
-                        <div class="card mb-4">
-                            <a href="#!"><img class="card-img-top" src="{{$post->image}}" width="700px" height="350px" alt="..." /></a>
-                            <div class="card-body">
-                                <div class="small text-muted">{{$post->created_at}}</div>
-                                <h2 class="card-title h4">{{$post->title}}</h2>
-                                <p class="card-text text-truncate" style="max-width: 200px; ">{{$post->description}}</p>
-                                <a class="btn primaryBtn" href="{{route('blogposts',$post->id)}}">Read more →</a>
+                @isset($posts)
+                    
+                    @foreach ($posts as $post)
+                        <div class="col-lg-6">
+                            <div class="card mb-4">
+                                <a href="#!"><img class="card-img-top" src="{{asset($post->image)}}" width="700px" height="350px" alt="..." /></a>
+                                <div class="card-body">
+                                    <div class="small text-muted">{{$post->created_at}}</div>
+                                    <h2 class="card-title h4">{{$post->title}}</h2>
+                                    <p class="card-text text-truncate" style="max-width: 200px; ">{{$post->description}}</p>
+                                    <a class="btn primaryBtn" href="{{route('blogposts',$post->id)}}">Read more →</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @empty
+                    @endforeach
+                        
+                @else
                     <div class="col-lg-6">
                         <div class="card mb-4">
                             <a href="#!"><img class="card-img-top" src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..." /></a>
@@ -75,7 +79,7 @@
                             </div>
                         </div>
                     </div> 
-                @endforelse
+                @endisset
                     <!-- Blog post-->
                     {{-- <div class="card mb-4">
                         <a href="#!"><img class="card-img-top" src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..." /></a>
@@ -111,7 +115,11 @@
             <!-- Pagination-->
             <nav aria-label="Pagination">
                 <hr class="my-0" />
-                {{$posts->links('pagination::bootstrap-5')}}
+                @isset($posts)
+                    
+                    {{$posts->links('pagination::bootstrap-5')}}
+                    
+                @endisset
                 {{-- <ul class="pagination justify-content-center my-4">
                     <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
                     <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
@@ -140,11 +148,11 @@
                 <div class="card-header">Categories</div>
                 <div class="card-body">
                     <div class="row">
-                        @isset($categories)
+                       @isset($categories)
                             <div class="col-sm-6">
                                 <ul class="list-unstyled mb-0">
                                     @foreach ($categories as $item)
-                                        <li><a href="#!">{{$item->name}}</a></li>
+                                        <li><a href="{{route('postByCategory',$item->id)}}">{{$item->name}}</a></li>
                                     @endforeach
                                 </ul>
                             </div>

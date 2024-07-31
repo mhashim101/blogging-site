@@ -13,9 +13,16 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Models\EmailVerificationToken;
+use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
+    public function postByCategory($id){
+        $categories = Category::all();
+        $postByCategory = Post::with('category')->where('category_id',$id)->get();
+        return view('Home.postcategory',['posts' => $postByCategory,'categories' => $categories]);
+    }
+
     // Homepage of site
     public function showHomePage(){
         if(Auth::guest()){
@@ -24,18 +31,34 @@ class UserController extends Controller
             $posts = Post::with('user','category')->paginate(4);
             return view('Home.homepage',compact(['posts','latestPost','categories']));
         }else{
-            return redirect()->route('dashboard');
+
+            if(!Auth::user()->role == 'user'){
+                return redirect()->route('dashboard');
+            }else{
+                $categories = Category::all();
+                $latestPost = Post::orderBy('created_at', 'desc')->first();
+                $posts = Post::with('user','category')->paginate(4);
+                return view('Home.homepage',compact(['posts','latestPost','categories']));
+            }
+
         }
     }
    
 
     public function showBlogPosts($id){
         if(Auth::guest()){
+            $categories = Category::all();
             $posts = Post::with('user','category','comment.user','comment.replies.user')->find($id);
-            // return $posts;
-            return view('Home.postblog',compact('posts'));
+            return view('Home.postblog',compact(['posts','categories']));
         }else{
-            return redirect()->route('dashboard');
+            if(Auth::user()->role == 'user'){
+                $categories = Category::all();
+                $posts = Post::with('user','category','comment.user','comment.replies.user')->find($id);
+                // return $posts;
+                return view('Home.postblog',compact(['posts','categories']));
+            }else{
+                return redirect()->route('dashboard');
+            }
         }
     }
 
@@ -46,18 +69,25 @@ class UserController extends Controller
         if(Auth::guest()){
             return view('register');
         }else{
-            return redirect()->route('dashboard');
+            if(Auth::user()->role === 'user'){
+                return view('Home.homepage');
+            }else{
+                return redirect()->route('dashboard');
+            }
         }
      }
 
      // Show login form
      public function showLoginForm()
      {
-        // return view('login');
         if(Auth::guest()){
             return view('login');
         }else{
-            return redirect()->route('dashboard');
+            if(Auth::user()->role === 'user'){
+                return view('Home.homepage');
+            }else{
+                return redirect()->route('dashboard');
+            }
         }
          
      }
@@ -69,46 +99,69 @@ class UserController extends Controller
      // Show dashboard form
      public function showAllUsersPage()
      {
-        $users  = User::where('id','!=',Auth::user()->id)->paginate(5);
-         return view('allusers',compact('users'));
+        if(Auth::guest()){
+            return view('login');
+        }else{
+            if(Auth::user()->role == 'vendor'){
+                return redirect()->route('dashboard');
+            }else{
+                $users  = User::where('id','!=',Auth::user()->id)->paginate(5);
+                return view('allusers',compact('users'));
+            }
+        }
+
+        
      }
      public function destroyUser($id)
      {
-        $user = User::find($id);
-        if ($user->profile) {
-            File::delete(public_path('img/'.$user->profile));
+
+        if(Auth::guest()){
+            return view('login');
+        }else{
+
+            if(Auth::user()->role == 'vendor'){
+                return redirect()->route('dashboard');
+            }else{
+                $user = User::find($id);
+                if ($user->profile) {
+                    File::delete(public_path('img/'.$user->profile));
+                }
+
+                $user->delete();
+                return redirect()->route('allusers')->with('success','User Successfully Deleted!');
+            }
         }
-        $user->delete();
-        return redirect()->route('allusers')->with('success','User Successfully Deleted!');
-        // $users  = User::where('id','!=',Auth::user()->id)->paginate(5);
-        //  return view('allusers',compact('users'));
+       
      }
      // Show addPostPage form
      public function addPostPage()
-     {
+     {  
         $categories = Category::all();
          return view('addpost',compact('categories'));
      }
      // Show showCategoriesPage
      public function showCategoriesPage()
      {  
+        if(Auth::user()->role == 'vendor'){
+            return redirect()->route('dashboard');
+        }
         $categories = Category::all();
          return view('categories',compact('categories'));
      }
-     // Show Categories on Addpost page
-    //  public function showCategoriesOnAddPostPage()
-    //  {  
-    //     $categories = Category::all();
-    //      return view('addpost',compact('categories'));
-    //  }
-    //  // Show showAddCategoryPage
+   
      public function showAddCategoryPage()
-     {
-         return view('addcategory');
+     {  
+        if(Auth::user()->role == 'vendor'){
+            return redirect()->route('dashboard');
+        }
+        return view('addcategory');
      }
      // Show showAddCategoryPage
      public function addcategory(Request $request)
      {
+        if(Auth::user()->role == 'vendor'){
+            return redirect()->route('dashboard');
+        }
         $request->validate([
             'name' => 'required|string',
         ]);
@@ -122,6 +175,9 @@ class UserController extends Controller
 
     //  Delete Category
     public function destroyCategory($id){
+        if(Auth::user()->role == 'vendor'){
+            return redirect()->route('dashboard');
+        }
         $category = Category::find($id);
         $category->delete();
         return redirect()->route('categories')->with('success','Post Successfully Deleted!');
@@ -134,6 +190,9 @@ class UserController extends Controller
      // Show deletePostPage form
      public function deletePostPage()
      {
+        if(Auth::user()->role == 'vendor'){
+            return redirect()->route('dashboard');
+        }
          return view('deletebyid');
      }
      // Show updatePostPage form
@@ -215,39 +274,45 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:8',
         ]);
-       
-            if (Auth::attempt($credentials)) {
-                // Retrieve the authenticated user
-                $user = User::where('email', $request->email)->first();
-        
-                // Check if user exists and if their email is verified
-                if ($user && $user->email_verified_at !== null) {
-                    // Redirect to the dashboard
+        if (Auth::attempt($credentials)) {
+          
+            $user = User::where('email', $request->email)->first();
+            if ($user && $user->email_verified_at !== null) {
+                if(Auth::user()->role == 'user'){
+                    // return redirect()->intende;
+                    return redirect()->route('homepage');
+                }else{
                     return redirect()->route('dashboard');
-                } else {
-                    // Log the user out if email is not verified
-                    Auth::logout();
-                    return back()->withErrors([
-                        'error' => 'Your email address is not verified.',
-                    ]);
                 }
             } else {
-                // Authentication failed
+                Auth::logout();
                 return back()->withErrors([
-                    'error' => 'The provided credentials do not match our records.',
+                    'error' => 'Your email address is not verified.',
                 ]);
             }
+        } else {
+            return back()->withErrors([
+                'error' => 'The provided credentials do not match our records.',
+            ]);
+        }
 
-}
+    }
 
 
     // Logout method
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/');
+        if(!Auth::user()->role == 'user'){
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/');
+        }else{
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('homepage');
+        }
     }
 
 }
