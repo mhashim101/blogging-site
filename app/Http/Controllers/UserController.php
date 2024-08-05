@@ -17,6 +17,60 @@ use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
+
+    public function editUserPage($id){
+        $user = User::findOrFail($id);
+        return view('edituser',compact('user'));
+    }
+
+
+    public function updateUser($id, Request $request){
+       $validate = $request->validate([
+        'name' => 'required|string',
+        'email' => 'required|email',
+        'role' => 'required|string',
+        'profile' => 'nullable|image|string',
+       ]);
+
+       $imagePath = null;
+       $user = User::findOrFail($id);
+
+       if($request->hasFile('profile')){
+
+            File::delete(public_path('img/'.$user->profile));
+
+
+            $image = $request->file('profile');
+            $imageName = time().'_'.$image->getClientOriginalName();
+            $image->move(public_path('img'),$imageName);
+            $imagePath = 'img/'.$imageName;
+            $user->profile = $imagePath;
+            $user->save();
+
+       }
+
+       $user->name = $request->name;
+       $user->email = $request->email;
+       $user->role = $request->role;
+       $user->save();
+
+       return redirect()->route('allusers')->with('success','Record updated successfully!');
+       
+    }
+
+    public function changeRole(Request $request){
+        $validated = $request->validate([
+            'role' => 'required|string|max:255',
+        ]);
+    
+        // Assuming user_id is passed through a hidden field or another way
+        $user = User::find($request->user_id);
+        $user->role = $request->role;
+        $user->save();
+    
+        return redirect()->route('allusers');
+    }
+
     public function postByCategory($id){
         $categories = Category::all();
         $postByCategory = Post::with('category')->where('category_id',$id)->get();
@@ -48,7 +102,7 @@ class UserController extends Controller
     public function showBlogPosts($id){
         if(Auth::guest()){
             $categories = Category::all();
-            $posts = Post::with('user','category','comment.user','comment.replies.user')->find($id);
+            $posts = Post::with('user','category','comment.user','comment.replies.user','like')->find($id);
             return view('Home.postblog',compact(['posts','categories']));
         }else{
             if(Auth::user()->role == 'user'){
@@ -306,12 +360,12 @@ class UserController extends Controller
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect('/');
+            return redirect('homepage');
         }else{
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect('homepage');
+            return redirect('/');
         }
     }
 

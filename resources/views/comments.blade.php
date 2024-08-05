@@ -37,16 +37,16 @@
 <div class="container-fluid px-0" style="background-color: #D6EFD8;">
     <div class="row px-5" style="background-color: #D6EFD8; height: 100vh;">
         <div class="col-12">
-            <div class="row mt-4">
+            <div class="row shadow p-3 mt-3 mb-5 rounded" style="background-color: #508d4e;">
                 <div class="col-10">
-                    <h1 class="fw-bold">All Comments</h1>
+                    <h2 class="fw-bold mb-0">All Comments</h2>
                 </div>
-                <div class="col-2">
+                <div class="col-2 d-flex justify-content-center align-items-center">
                     <a href="{{route('dashboard')}}">Home</a> \ Comments
                 </div>
-                <hr class="w-100">
+                {{-- <hr class="w-100"> --}}
             </div>
-            <div class="row">
+            <div class="row shadow p-3 mt-3 mb-5 rounded" style="background-color: #508d4e;">
                 @if (session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
@@ -64,10 +64,11 @@
                             <thead>
                                 <tr>
                                     <th scope="col" >S.No</th>
-                                    <th scope="col" >Author</th>
                                     <th scope="col" >Comment</th>
+                                    <th scope="col" >Author</th>
                                     <th scope="col" >Email</th>
                                     <th scope="col" >Post Title</th>
+                                    <th scope="col" >Comment Replies</th>
                                     <th scope="col" class="text-center">Delete</th>
                                 </tr>
                             </thead>
@@ -77,14 +78,20 @@
                                 @foreach  ($comments as $key => $comment) 
                                     <tr>
                                         <td>{{$comment->id}}</td>
-                                        <td>{{$comment->author}}</td>
                                         <td>
                                             <span class="d-inline-block text-truncate" style="max-width: 150px;">
-                                                {{$comment->comment}}
+                                                {{$comment->body}}
                                             </span>
                                         </td>
-                                        <td>{{$comment->email}}</td>
+                                        <td>{{$comment->user->name}}</td>
+                                        <td>{{$comment->user->email}}</td>
                                         <td>{{$comment->post->title}}</td>
+                                       
+                                        <td class="text-center">
+                                            <a href="{{route('showCommentReplies',$comment->id)}}" class="btn primaryBtn  btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">View Replies</a>
+                                            
+                                        </td>
+                                        
                                         {{-- <td class="text-center">
                                             <img src="{{ asset($userPost->image) }}" width="50px" alt="">
                                         </td> --}}
@@ -99,7 +106,7 @@
                                         </td> --}}
                                         @if (Auth::user()->role == 'admin')
                                             <td class="text-center">
-                                                <form action="{{route('destroyComment',$comment->id)}}" method="post">
+                                                <form action="{{route('deleteComment',$comment->id)}}" method="post">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">Delete</button>

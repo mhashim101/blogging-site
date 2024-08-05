@@ -28,10 +28,56 @@
                             {{-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> --}}
                         </header>
                         <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="{{asset($posts->image)}}" alt="..." /></figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded mb-2" src="{{asset($posts->image)}}" alt="..." />
+
+                                @php
+                                    $userHasLiked = $posts->like->contains('user_id', Auth::user()->id);
+                                @endphp
+
+                                @if ($userHasLiked)
+                                    <form action="{{ route('dislike', $posts->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="border-0">
+                                            <img src="{{ asset('img/like.png') }}" width="40px" height="40px" alt="Dislike">
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('like', $posts->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="border-0">
+                                            <img src="{{ asset('img/dislike.png') }}" width="40px" height="40px" alt="Like">
+                                        </button>
+                                    </form>
+                                @endif
+
+
+                            {{-- @isset($posts->like->user_id)
+                                @if ($posts->like->user_id == Auth::user()->id)
+                                    <form action="{{ route('dislike', $posts->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="border-0"><img src="{{asset('img/like.png')}}" width="40px" height="40px" alt=""></button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('like', $posts->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="border-0"><img src="{{asset('img/dislike.png')}}" width="40px" height="40px" alt=""></button>
+                                    </form>
+                                @endif
+                            @else 
+                                <form action="{{ route('like', $posts->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="border-0"><img src="{{asset('img/like.png')}}" width="40px" height="40px" alt=""></button>
+                                </form> 
+                            @endisset --}}
+                                <span>{{ $posts->like->count() }} likes</span>
+                        </figure>
                         <!-- Post content-->
                         <section class="mb-5">
                             <p class="fs-5 mb-4">{{$posts->description}}</p>
+                            {{-- {!! $posts->description !!} --}}
                         </section>
                     </article>
                 {{-- @endforeach --}}
@@ -56,11 +102,7 @@
                 </article>
             @endisset
 
-            {{-- @forelse ($posts as $key => $value )
-                
-            @empty
-                
-            @endforelse --}}
+            
             <!-- Comments section-->
             <section class="mb-5">
                 <div class="card bg-light">
@@ -76,7 +118,7 @@
                                             
                                                 <div class="row">
                                                     <div class="col-sm-10">
-                                                        <div id="comment-{{$comment->id}}">
+                                                        <div id="comments-{{$comment->id}}">
                                                             <div class="comment-user">
                                                                 {{$comment->user->name}}
                                                                 @if($comment->user->role == 'vendor')
@@ -108,7 +150,7 @@
                                                                     ...
                                                                 </button>
                                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                        <li><button class="dropdown-item fs-7" onclick="editComment('edit-comment-form-{{$comment->id}}','comment-{{$comment->id}}','comment-text-{{$comment->id}}')">Edit</button></li>
+                                                                        <li><button class="dropdown-item fs-7" onclick="editComment('edit-comment-form-{{$comment->id}}','comments-{{$comment->id}}','comment-text-{{$comment->id}}')">Edit</button></li>
                                                                         <li>
                                                                             <form action="{{route('deleteComment',$comment->id)}}" method="post">
                                                                                 @csrf
@@ -176,8 +218,8 @@
                                             @endforelse                                           
                                         @endisset
                                     </div>
-                            
                                 </div>
+
                                 <!-- New Comment Form -->
                                 <div class="comment-form">
                                     <form action="{{route('storeComment')}}" method="post">
@@ -188,152 +230,35 @@
                                                 <input type="hidden" name="post_id" value="{{$posts->id}}">
                                                 <input type="text" id="new-comment-input" placeholder="Write a comment..." class="reply-input w-100" name="body">           
                                             </div>
-                                            @if(Auth::check())
-                                            <div class="col-md-2">
-                                                <button type="submit" class="send-reply-btn primaryBtn w-100">Send</button>
-                                            </div>
+                                            @if(Auth::guest() == false)
+                                                <div class="col-md-2">
+                                                    <button type="submit" class="send-reply-btn primaryBtn w-100">Send</button>
+                                                </div>
                                             @else
-                                            <div class="col-md-2 d-flex justify-content-center align-items-center comment mb-0">
-                                                <a href="{{route('loginPage')}}" class="text-decoration-none primaryBtn text-center send-reply-btn w-100 me-3">Send</a>
-                                            </div>
+                                                <div class="col-md-2 d-flex justify-content-center align-items-center comment mb-0">
+                                                    <a href="{{route('loginPage')}}" class="text-decoration-none primaryBtn text-center send-reply-btn w-100 me-3">Send</a>
+                                                </div>
                                             @endif
                                         </div>
                                     </form>
-                                </div>
-                                {{-- <div class="comment-form">
-                                    <form action="{{route('storeComment')}}" method="post">
-                                        @csrf
-                                        <div class="row">
-                                            <div class="col-md-10">
-                                                <input type="hidden" name="user_id" value="{{ Auth::guest() == false ? Auth::user()->id : null }}">
-                                                <input type="hidden" name="post_id" value="{{$posts->id}}">
-                                                <input type="text" id="new-comment-input" placeholder="Write a comment..." class="reply-input w-100" name="body">           
-                                            </div>
-                                            <div class="col-md-2">
-                                                <button type="submit" class="send-reply-btn w-100">Send</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div> --}}
+                                </div>                           
                             </div>
-                           
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
-
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        {{-- <div class="row d-flex justify-content-around text-align-center"> 
-                            <div class="col-m-12">
-                                <div class="comment-section" style="overflow-y: scroll; height: 400px;">
-                                    <div class="comment" id="comment-1">
-                                        @isset($posts)
-                                            
-                                            @foreach ($posts->comment as $comment)
-                                                <div class="comment-user">{{$comment->user->name}}</div>
-                                                <div class="comment-text">{{$comment->body}}</div>
-                                                @if (Auth::check() && Auth::user()->role === 'user')
-                                                    <div class="comment-actions">
-                                                        <button class="reply-btn" onclick="toggleReplyForm('reply-form-{{$comment->id}}')">Reply</button>
-                                                    </div>    
-                                                    <div class="reply-form" id="reply-form-{{$comment->id}}">
-                                                        <form action="{{route('storeReply')}}" method="POST">
-                                                            @csrf
-                                                            <input type="hidden" placeholder="Write a reply..." class="reply-input" name="comment_id" value="{{$comment->id}}">
-                                                            
-                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id"> 
-                                                           
-                                                            <input type="hidden" placeholder="Write a reply..." class="reply-input" name="post_id" value="{{$comment->post_id}}">
-                                                            <input type="text" placeholder="Write a reply..." class="reply-input" name="body">
-                                                            <button type="submit" class="send-reply-btn" >Send</button>
-                                                        </form>
-                                                    </div>
-                                                @endif
-                                                @foreach ($comment->replies as $reply)
-                                                    @if ($comment->id === $reply->comment_id)
-                                                        <div class="replies" id="replies-comment-1">
-                                                            <div class="reply" id="comment-1-{{$reply->id}}">
-                                                                <div class="comment-user">{{$reply->user->name}}</div>
-                                                                <div class="comment-text">{{$reply->body}}</div>
-                                                                @if (Auth::check() && Auth::user()->role === 'user')
-                                                                    <div class="comment-actions">
-                                                                        <button class="reply-btn" onclick="toggleReplyForm('reply-form-comment-1-{{$reply->id}}')">Reply</button>
-                                                                    </div>                                                                                                                         
-                                                                    <div class="replies" id="replies-comment-1-{{$reply->id}}">
-                                                                        <div class="reply-form" id="reply-form-comment-1-{{$reply->id}}">
-                                                                           
-                                                                            <form action="{{route('storeReply')}}" method="post">
-                                                                                @csrf
-                                                                                <input type="text" placeholder="Write a reply..." class="reply-input" name="body">
-                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="user_id">
-                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="post_id" value="{{$comment->post_id}}">
-                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="comment_id" value="{{$reply->comment_id}}">
-                                                                                <input type="hidden" placeholder="Write a reply..." class="reply-input" name="reply_id" {{$reply->id}}>
-                                                                                <button type="submit" class="send-reply-btn" >Send</button>
-                                                                            </form>
-                                                                         </div>
-                                                                    </div>
-                                                                @endif    
-                                                            </div>
-                                                        </div>
-                                                    
-                                                    @endif
-                                                @endforeach
-                                            @endforeach
-                                        @else
-                                            <div class="comment-user">User</div>
-                                            <div class="comment-text">No comments</div>
-                                        @endisset
-                                    </div>
-                            
-                                </div>
-                               
-                                    <div class="comment-form">
-                                        <form action="{{route('storeComment')}}" method="post">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-md-10 d-flex justify-content-center align-items-center">
-                                                    <input type="hidden" name="user_id" value="{{$posts->user->id}}">
-                                                    <input type="hidden" name="post_id" value="{{$posts->id}}">
-                                                    <input type="text" id="new-comment-input" placeholder="Write a comment..." class="reply-input w-100" name="body">           
-                                                </div>
-                                                @if(Auth::check())
-                                                <div class="col-md-2">
-                                                    <button type="submit" class="send-reply-btn w-100">Send</button>
-                                                </div>
-                                                @else
-                                                <div class="col-md-2 d-flex justify-content-center align-items-center comment mb-0">
-                                                    <a href="{{route('loginPage')}}" class="text-decoration-none text-center send-reply-btn w-100 me-3">Send</a>
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </form>
-                                    </div>
-                            </div>
-                        </div> --}}
-
                     </div>
                 </div>
             </section>
         </div>
         <!-- Side widgets-->
         <div class="col-lg-4">
-            <!-- Search widget-->
-            {{-- <div class="card mb-4">
-                <div class="card-header">Search</div>
-                <div class="card-body">
-                    <div class="input-group">
-                        <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                        <button class="btn primaryBtn" id="button-search" type="button">Go!</button>
-                    </div>
-                </div>
-            </div> --}}
             <!-- Categories widget-->
             <div class="card mb-4">
                 <div class="card-header">Categories</div>

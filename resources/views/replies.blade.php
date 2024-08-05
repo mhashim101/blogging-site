@@ -1,7 +1,7 @@
 @extends('layouts.masterlayout')
 
 @section('title')
-    All Posts
+    Comments
 @endsection
 
 @section('content')
@@ -39,13 +39,14 @@
         <div class="col-12">
             <div class="row shadow p-3 mt-3 mb-5 rounded" style="background-color: #508d4e;">
                 <div class="col-10">
-                    <h1 class="fw-bold mb-0">All Users</h1>
+                    <h2 class="fw-bold mb-0">All Comments</h2>
                 </div>
                 <div class="col-2 d-flex justify-content-center align-items-center">
-                    <a href="{{route('dashboard')}}" class="mb-0">Home</a> \ Users
+                    <a href="{{route('dashboard')}}">Home</a> \ Comments
                 </div>
+                {{-- <hr class="w-100"> --}}
             </div>
-            <div class="row shadow p-3 mb-5 rounded" style="background-color: #508d4e;">
+            <div class="row shadow p-3 mt-3 mb-5 rounded" style="background-color: #508d4e;">
                 @if (session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
@@ -57,46 +58,41 @@
                     </div>
                 @endif
 
-                <div class="col-12">                                    
+                <div class="col-12">
                     <div class="table-responsive">
                         <table id="example" style="width:100%" class="display">
                             <thead>
                                 <tr>
                                     <th scope="col" >S.No</th>
-                                    <th scope="col" >Name</th>
-                                    <th scope="col" >Email</th>
-                                    <th scope="col" class="text-center">Profile</th>
-                                    <th scope="col" class="text-center">Role</th>
-                                    <th scope="col" class="text-center">Edit</th>
+                                    <th scope="col" >Reply</th>
+                                    <th scope="col" >User</th>
                                     <th scope="col" class="text-center">Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($users as $user)
+                                @isset($replies)
+                                    
+                                @foreach  ($replies as $reply) 
                                     <tr>
-                                        <td>{{$user->id}}</td>
-                                        <td>{{$user->name}}</td>
+                                        <td>{{$reply->id}}</td>
                                         <td>
                                             <span class="d-inline-block text-truncate" style="max-width: 150px;">
-                                                {{$user->email}}
+                                                {{$reply->body}}
                                             </span>
                                         </td>
-                                        <td class="text-center">
-                                            <img src="{{ asset($user->profile) }}" width="50px" alt="">
-                                        </td>
-                                        <td class="text-center">
-                                            <span>{{$user->role}}</span>
-                                        </td>
-                                        <td class="text-center"> <a href="{{route('editPage',$user->id)}}" class="btn btn-warning btn-sm">Edit</a> </td>
-                                        <td class="text-center">
-                                            <form action="{{route('deleteUser',$user->id)}}" method="post">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>                      
-                                @empty
+                                        <td>{{$reply->user->name}}</td>
+                                        @if (Auth::user()->role == 'admin')
+                                            <td class="text-center">
+                                                <form action="{{route('deleteComment',$reply->id)}}" method="post">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">Delete</button>
+                                                </form>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                    @endforeach                      
+                                @else
                                     <tr>
                                         <td class="text-secondary">
                                             <span>No Record</span>
@@ -107,25 +103,23 @@
                                         <td class="text-secondary">
                                             <span>No Record</span>
                                         </td>
-                                        <td  class="text-secondary text-center">
+                                        <td class="text-secondary">
                                             <span>No Record</span>
                                         </td>
-                                        <td  class="text-secondary text-center">
+                                        <td class="text-secondary">
                                             <span>No Record</span>
                                         </td>
-                                        <td  class="text-secondary text-center">
+                                        <td class="text-secondary text-center">
                                             <span>No Record</span>
                                         </td>
-                                        <td  class="text-secondary text-center">
-                                            <span>No Record</span>
-                                        </td>
-                                    </tr>  
-                                @endforelse      
+                                        
+                                    </tr>   
+                                @endisset   
                             </tbody>
                         </table>
                     </div>
                     <div>
-                        {{ $users->links('pagination::bootstrap-5') }}
+                        {{-- {{ $replys->links('pagination::bootstrap-5') }} --}}
                     </div>
                 </div>
             </div>

@@ -32,4 +32,9 @@ class ReplyController extends Controller
     
 
     }
+
+    public function show($id){
+        $repliesOfSpecifiedComment = Reply::with('user')->where('comment_id',$id)->get();
+        return view('replies',['replies' => $repliesOfSpecifiedComment]);
+    }
 }

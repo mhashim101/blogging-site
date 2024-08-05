@@ -42,6 +42,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        // $description = $request->input('description');
        
        $request->validate([
             'title' => 'required|string',

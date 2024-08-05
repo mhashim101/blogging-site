@@ -25,6 +25,9 @@ class User extends Authenticatable
         return $this->hasMany(EmailVerificationToken::class);
     }
 
+    public function like(){
+        return $this->hasMany(Like::class);
+    }
  
     protected $fillable = [
         'name',

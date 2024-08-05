@@ -37,16 +37,16 @@
 <div class="container-fluid px-0" style="background-color: #D6EFD8;">
     <div class="row px-5" style="background-color: #D6EFD8; height: 100vh;">
         <div class="col-12">
-            <div class="row mt-4">
+            <div class="row shadow p-3 mt-3 mb-5 rounded" style="background-color: #508d4e;">
                 <div class="col-10">
-                    <h1 class="fw-bold">All Categories</h1>
+                    <h1 class="fw-bold mb-0">All Categories</h1>
                 </div>
-                <div class="col-2">
+                <div class="col-2 d-flex justify-content-center align-items-center">
                     <a href="{{route('dashboard')}}">Home</a> \ Categories
                 </div>
-                <hr class="w-100">
+                {{-- <hr class="w-100"> --}}
             </div>
-            <div class="row">
+            <div class="row shadow p-3 mt-3 mb-5 rounded" style="background-color: #508d4e;">
                 @if (session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}

@@ -29,9 +29,7 @@ class CommentController extends Controller
                 return redirect()->route('post.show',$request->post_id);
 
             }
-            // $post = Post::with('user','comment.user','comment.replies.user')->find($request->post_id);
-            // $post = Post::with('user', 'category', 'comment')->find($request->post_id);
-            // $comments = Comment::with('user','post')->where('post_id',$request->post_id)->get();
+          
         }
     
         return redirect()->back()->with('error', 'Comment could not be added.');
@@ -39,7 +37,7 @@ class CommentController extends Controller
 
     public function showComments(){
         $comments = Comment::with('user','post','replies')->get();
-        return $comments;
+        // return $comments;
         return view('comments',compact('comments'));
     }
 

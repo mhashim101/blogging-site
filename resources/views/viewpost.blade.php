@@ -24,7 +24,11 @@
 .editComment{
     display: none;
 }
+.comment-section{
+    display: none;
+}
 </style>
+
 @section('content')
     <div class="container-fluid px-0" style="background-color: #D6EFD8;">
         <div class="row px-5" style="background-color: #D6EFD8;">
@@ -113,6 +117,7 @@
                             <div class="card-body text-white">
                                 <h5 class="card-title">{{ $post->title }}</h5>
                                 <p class="card-text">{{ $post->description }}</p><br>
+        
                                 <p class="card-text"> <span class="text-light">Category: </span><strong
                                         class="border-2 rounded">{{ $post->category->name }}</strong></p>
                                 @if ($post->image != '')
@@ -125,22 +130,47 @@
                             <div class="card-footer">
                                 <div class="row d-flex justify-content-around text-align-center px-1 py-2">
                                     <div class="col-md-4">
-                                        Like
+                                        @php
+                                        $userHasLiked = $post->like->contains('user_id', Auth::user()->id);
+                                        @endphp
+        
+                                        @if ($userHasLiked)
+                                            <form action="{{ route('dislike', $post->id) }}" class="d-inline" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="border-0 fs-5 text-primary" style="background-color:#508D4E;">
+                                                    Like
+                                                    {{-- <img src="{{ asset('img/like.png') }}" width="40px" height="40px" alt="Dislike"> --}}
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('like', $post->id) }}" class="d-inline" method="POST">
+                                                @csrf
+                                                <button type="submit" class="border-0 fs-5" style="background-color:#508D4E;">
+                                                    Like
+                                                    {{-- <img src="{{ asset('img/dislike.png') }}" width="40px" height="40px" alt="Like"> --}}
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <span class="d-inline">{{ $post->like->count() }} likes</span>
                                     </div>
                                     <div class="col-md-4 text-center">
-                                        Comment
+                                        <button class="border-0 fs-5" style="background-color:#508D4E;" id="CommentSection">Comments</button>
+                                       <span class="d-inline">{{ $post->comment->count() }} likes</span>
                                     </div>
                                     <div class="col-md-4 text-end">
-                                        Share
+                                        <button class="border-0 fs-5" style="background-color:#508D4E;" onclick="copyCurrentUrl()">Share</button>
+                                        <span class="d-inline">{{ $post->like->count() }} likes</span>
                                     </div>
                                 </div>
                                 <div class="row d-flex justify-content-around text-align-center"> 
                                     <div class="col-m-12">
-                                        <div class="comment-section" style="">
+                                        <div class="comment-section" id="comment-section" style="">
                                             <div class="comment" id="comment-1">
                                                 @isset($post)
-                                                    
-                                                    @foreach ($post->comment as $comment)
+                                                     
+
+                                                    @forelse ($post->comment as $comment)
                                                         <div class="row">
                                                             <div class="col-sm-10">
                                                                 <div id="comment-{{$comment->id}}">
@@ -223,10 +253,11 @@
                                                             
                                                             @endif
                                                         @endforeach
-                                                    @endforeach
-                                                @else
-                                                    <div class="comment-user">User</div>
-                                                    <div class="comment-text">No comments</div>
+                                                    
+                                                    @empty
+                                                        {{-- <div class="comment-user">User</div> --}}
+                                                        <div class="comment-text">No comments</div>
+                                                    @endforelse
                                                 @endisset
                                             </div>
                                     
@@ -258,6 +289,18 @@
         </div>
     </div>
 @endsection
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $('#CommentSection').click(function(){
+            $('#comment-section').slideToggle();
+        })
+
+    });
+</script>
+
 
 <script>
 function editComment(editForm, commentBox, comment) {
@@ -283,5 +326,30 @@ function toggleReplyForm(replyFormId) {
         replyForm.style.display = 'none';
     }
 }
+
+
+// Share post 
+
+function copyCurrentUrl() {
+    const url = window.location.href;
+    const tempInput = document.createElement('input');
+    tempInput.value = url;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    alert('Current posts URL copied to clipboard!');
+}
+
+// Show Comments Section
+
+// function showComments(commentsClass){
+//     const commentSection = document.getElementById(commentsClass);
+//     if(commentSection.style.display == 'none' || commentSection.style.display == ''){
+//         commentSection.style.display == 'block';
+//     }else{
+//         commentSection.style.display == 'none';
+//     }
+// }
 
 </script>

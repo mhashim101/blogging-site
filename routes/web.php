@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReplyController;
@@ -39,20 +40,29 @@ Route::middleware(['ok-user'])->group(function(){
         Route::delete('/deleteUser/{id}','destroyUser')->name('deleteUser');
         Route::get('/destroyCategory/{id}','destroyCategory')->name('destroyCategory');
         Route::get('/categories/addcategory','showAddCategoryPage')->name('addcategorypage');
-    
+        Route::post('/updaterole','changeRole')->name('changeRole');
+        Route::get('/editPage/{id}','editUserPage')->name('editPage');
+        Route::put('/updateUser/{id}','updateUser')->name('updateUser');
     });
 
-    
-    Route::get('/showComments',[CommentController::class,'showComments'])->name('showComments');
+    //Comment Controller
 });
 
-//Comment Controller
+Route::controller(LikeController::class)->group(function(){
+    Route::post('/likePost/{id}','likePost')->name('like');
+    Route::delete('/unlikePost/{id}','unlikePost')->name('dislike');
+    // Route::get('/like','index')->name('likes');
+});
+
+
 Route::controller(CommentController::class)->group(function(){
     Route::post('/comment','store')->name('storeComment');
     Route::post('/update','update')->name('updateComment');
     Route::get('/delete/{id}','destroy')->name('deleteComment');
     
 });
+//Comment Controller
+Route::get('/showComments',[CommentController::class,'showComments'])->name('showComments');
 
 
 
@@ -60,6 +70,7 @@ Route::controller(CommentController::class)->group(function(){
 
 Route::controller(ReplyController::class)->group(function(){
     Route::post('/reply','storeReply')->name('storeReply');
+    Route::get('/showreply/{id}','show')->name('showCommentReplies');
 });
 
 
