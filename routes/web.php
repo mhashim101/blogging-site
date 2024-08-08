@@ -10,8 +10,6 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EmailVerificationController;
 
 
-
-
 Route::view('verifyemail','/verifyemail')->name('verifyemail');
 // Route::view('emails/notverified','/notverified')->name('notverifyemail');
 
