@@ -16,62 +16,71 @@
             <!-- Post content-->
             @isset($posts)
                 {{-- @foreach ($posts as $value) --}}
-                    <article>
+                    <article class="border boder-3 rounded shadow p-3 mb-3">
                         <!-- Post header-->
                         <header class="mb-4">
                             <!-- Post title-->
-                            <h1 class="fw-bolder mb-1">{{$posts->title}}</h1>
+                            <h1 class="fw-bolder mb-2">{{$posts->title}}</h1>
                             <!-- Post meta content-->
-                            <div class="text-muted fst-italic mb-2">Posted on {{$posts->created_at->format('g:i A')}}</div>
+                            <div class="fw-bolder text-muted"> 
+                                <span class="text-muted fst-italic">Author: </span>
+                                {{$posts->user->name}}
+                                @auth
+                                    @if ($posts->user->isFollowing(Auth::user()))
+                                        <form action="{{ route('unFollowUser',$posts->user->id) }}" style="display: unset;" method="POST" class="">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn primaryBtn btn-sm d-inline" style="padding: 0.05rem 1rem; font-size: 0.875rem; border-radius: .2rem;">Unfollow</button>
+
+                                            {{-- <button type="submit" class="btn primaryBtn btn-md">Unfollow</button> --}}
+                                        </form>
+                                    @else
+                                        <form action="{{route('followUser',$posts->user->id)}}" style="display: unset;" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn primaryBtn btn-sm d-inline" style="padding: 0.05rem 1rem; font-size: 0.875rem; border-radius: .2rem;">Follow</button>
+
+                                            {{-- <button type="submit" class="btn primaryBtn btn-md">Follow</button> --}}
+                                        </form>
+                                    @endif
+                                @endauth
+                                {{-- <form action="" style="display: unset;">
+                                    <button type="submit" class="btn btn-dark btn-sm d-inline" style="padding: 0.05rem 1rem; font-size: 0.875rem; border-radius: .2rem;">Follow</button>
+                                </form> --}}
+                            </div>
+                            <div class="text-muted fst-italic mb-2">{{$posts->created_at->diffForHumans()}}</div>
                             <!-- Post categories-->
-                            <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{$posts->category->name}}</a>
+                           {{-- <span class="text-muted fst-italic mb-2">Tags: <a class="badge bg-secondary text-decoration-none link-light" href="#!">{{$posts->category->name}}</a></span> --}}
                             {{-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> --}}
                         </header>
                         <!-- Preview image figure-->
                         <figure class="mb-4">
                             <img class="img-fluid rounded mb-2" src="{{asset($posts->image)}}" alt="..." />
+                                @isset(Auth::user()->id)   
+                                
+                                    @php
+                                        $userHasLiked = $posts->like->contains('user_id', Auth::user()->id);
+                                    @endphp
 
-                                @php
-                                    $userHasLiked = $posts->like->contains('user_id', Auth::user()->id);
-                                @endphp
+                                    @if ($userHasLiked)
+                                        <form action="{{ route('dislike', $posts->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="border-0">
+                                                <img src="{{ asset('img/like.png') }}" width="40px" height="40px" alt="Dislike">
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('like', $posts->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="border-0">
+                                                <img src="{{ asset('img/dislike.png') }}" width="40px" height="40px" alt="Like">
+                                            </button>
+                                        </form>
+                                    @endif
 
-                                @if ($userHasLiked)
-                                    <form action="{{ route('dislike', $posts->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="border-0">
-                                            <img src="{{ asset('img/like.png') }}" width="40px" height="40px" alt="Dislike">
-                                        </button>
-                                    </form>
-                                @else
-                                    <form action="{{ route('like', $posts->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="border-0">
-                                            <img src="{{ asset('img/dislike.png') }}" width="40px" height="40px" alt="Like">
-                                        </button>
-                                    </form>
-                                @endif
+                                @endisset
 
-
-                            {{-- @isset($posts->like->user_id)
-                                @if ($posts->like->user_id == Auth::user()->id)
-                                    <form action="{{ route('dislike', $posts->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="border-0"><img src="{{asset('img/like.png')}}" width="40px" height="40px" alt=""></button>
-                                    </form>
-                                @else
-                                    <form action="{{ route('like', $posts->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="border-0"><img src="{{asset('img/dislike.png')}}" width="40px" height="40px" alt=""></button>
-                                    </form>
-                                @endif
-                            @else 
-                                <form action="{{ route('like', $posts->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="border-0"><img src="{{asset('img/like.png')}}" width="40px" height="40px" alt=""></button>
-                                </form> 
-                            @endisset --}}
                                 <span>{{ $posts->like->count() }} likes</span>
                         </figure>
                         <!-- Post content-->
@@ -106,6 +115,9 @@
             <!-- Comments section-->
             <section class="mb-5">
                 <div class="card bg-light">
+                    <div class="card-header" style="background-color: #1A5319;">
+                        <h4 class="text-white">Comments</h4>
+                    </div>
                     <div class="card-body">
                         <!-- Comment form-->
                         <div class="row d-flex justify-content-around text-align-center"> 
@@ -120,8 +132,9 @@
                                                     <div class="col-sm-10">
                                                         <div id="comments-{{$comment->id}}">
                                                             <div class="comment-user">
+                                                                <img src="{{asset($comment->user->profile)}}" alt="" class="rounded-circle img-fluid" style="object-fit: cover; width: 50px; height: 50px;">
                                                                 {{$comment->user->name}}
-                                                                @if($comment->user->role == 'vendor')
+                                                                @if($comment->user->role == 'blogger')
                                                                 <span class="text-secondary" style="font-size: 12px;">author</span>
                                                                 @endif
                                                             </div>

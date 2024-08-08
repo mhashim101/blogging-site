@@ -91,25 +91,25 @@
                             <div class="col-12">
                                 <ul id="ul-a" class="list-unstyled">
                                     <li class="nav-item text-decoration-none ">
-                                        <a href="{{route('dashboard')}}" class="nav-link text-light">
+                                        <a href="{{route('admindashboard')}}" class="nav-link text-light">
                                             <img src="{{asset('img/icons8-dashboard-100.png')}}" alt=""> 
                                             Dashboard
                                         </a>
                                     </li>
                                     <li class="nav-item text-decoration-none ">
-                                        <a href="{{route('post.index')}}" class="nav-link text-light">
+                                        <a href="{{route('adminallposts')}}" class="nav-link text-light">
                                             <img src="{{asset('img/icons8-post-100.png')}}" alt=""> 
                                             View Posts
                                         </a>
                                     </li>
                                     <li class="nav-item text-decoration-none ">
-                                        <a href="{{route('addpost')}}" class="nav-link text-light">
+                                        <a href="{{route('adminaddpost')}}" class="nav-link text-light">
                                             <img src="{{asset('img/icons8-add-100.png')}}" alt=""> 
                                             Add Post
                                         </a>
                                     </li>
                                     <li class="nav-item text-decoration-none ">
-                                        <a href="{{route('updateById')}}" class="nav-link text-light">
+                                        <a href="{{route('adminupdateById')}}" class="nav-link text-light">
 
                                             <img src="{{asset('img/icons8-update-100.png')}}" alt=""> 
                                             Update Post
@@ -186,7 +186,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item text-decoration-none ">
-                                        <a href="{{route('post.index')}}" class="nav-link text-light">
+                                        <a href="{{route('allposts')}}" class="nav-link text-light">
                                             <img src="{{asset('img/icons8-post-100.png')}}" alt=""> 
                                             View Posts
                                         </a>
@@ -277,25 +277,25 @@
                                                             <div class="col-12">
                                                                 <ul id="ul-a" class="list-unstyled">
                                                                     <li class="nav-item text-decoration-none ">
-                                                                        <a href="{{route('dashboard')}}" class="nav-link text-light">
+                                                                        <a href="{{route('admindashboard')}}" class="nav-link text-light">
                                                                             <img src="{{asset('img/icons8-dashboard-100.png')}}" alt=""> 
                                                                             Dashboard
                                                                         </a>
                                                                     </li>
                                                                     <li class="nav-item text-decoration-none ">
-                                                                        <a href="{{route('post.index')}}" class="nav-link text-light">
+                                                                        <a href="{{route('adminallposts')}}" class="nav-link text-light">
                                                                             <img src="{{asset('img/icons8-post-100.png')}}" alt=""> 
                                                                             View Posts
                                                                         </a>
                                                                     </li>
                                                                     <li class="nav-item text-decoration-none ">
-                                                                        <a href="{{route('addpost')}}" class="nav-link text-light">
+                                                                        <a href="{{route('adminaddpost')}}" class="nav-link text-light">
                                                                             <img src="{{asset('img/icons8-add-100.png')}}" alt=""> 
                                                                             Add Post
                                                                         </a>
                                                                     </li>
                                                                     <li class="nav-item text-decoration-none ">
-                                                                        <a href="{{route('updateById')}}" class="nav-link text-light">
+                                                                        <a href="{{route('adminupdateById')}}" class="nav-link text-light">
                                                                             <img src="{{asset('img/icons8-update-100.png')}}" alt=""> 
                                                                             Update Post
                                                                         </a>
@@ -383,7 +383,7 @@
                                                                         </a>
                                                                     </li>
                                                                     <li class="nav-item text-decoration-none ">
-                                                                        <a href="{{route('post.index')}}" class="nav-link text-light">
+                                                                        <a href="{{route('allposts')}}" class="nav-link text-light">
                                                                             <img src="{{asset('img/icons8-post-100.png')}}" alt=""> 
                                                                             View Posts
                                                                         </a>

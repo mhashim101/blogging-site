@@ -59,6 +59,15 @@
                         {{ session('error') }}
                     </div>
                 @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form id="loginForm" action="{{route('loginMatch')}}" method="post" style="width: 30% !important;" class="m-auto p-5">
                     @csrf
                     <h1 class="text-center">Sign In</h1>
@@ -89,15 +98,7 @@
                     </div>
                 </form>
             </div>
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+         
         </div>
     </div>
 

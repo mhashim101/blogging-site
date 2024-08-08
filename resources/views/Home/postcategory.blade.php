@@ -25,7 +25,7 @@
                         <div class="card mb-4">
                             <img class="card-img-top" src="{{asset($post->image)}}" width="700px" height="350px" alt="..." />
                             <div class="card-body">
-                                <div class="small text-muted">{{$post->created_at}}</div>
+                                <div class="small text-muted">{{$post->created_at->diffForHumans()}}</div>
                                 <h2 class="card-title h4">{{$post->title}}</h2>
                                 <p class="card-text text-truncate" style="max-width: 200px; ">{{$post->description}}</p>
                                 <a class="btn primaryBtn" href="{{route('blogposts',$post->id)}}">Read more →</a>

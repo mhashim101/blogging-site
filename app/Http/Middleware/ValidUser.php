@@ -15,15 +15,7 @@ class ValidUser
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {
-        if (!Auth::check()) {
-            return redirect('/login');
-        }
-
-        if(Auth::check() && Auth::user()->role == 'user'){
-            return redirect()->route('homepage');
-        }
-        return $next($request);
-      
+    {   
+       return $next($request);
     }
 }

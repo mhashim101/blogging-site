@@ -1,14 +1,5 @@
 @extends('Home.layouts.homemasterlayout')
 
-{{-- @section('active_home')
-<li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('homepage')}}">Home</a></li>
-@endsection --}}
-
-{{-- @section('active_blog')
-<li class="nav-item"><a class="nav-link" href="{{route('postblog')}}">Blog</a></li>
-@endsection --}}
-
-
 @section('header')
     <header class="py-5 bg-light border-bottom mb-4">
         <div class="container">
@@ -30,7 +21,7 @@
                 <div class="card mb-4">
                     <a href="#!"><img class="card-img-top" src="{{asset($latestPost->image)}}" alt="..." /></a>
                     <div class="card-body">
-                        <div class="small text-muted">{{$latestPost->created_at->format('g:i A')}}</div>
+                        <div class="small text-muted">{{$latestPost->created_at->diffForHumans()}}</div>
                         <h2 class="card-title">{{$latestPost->title}}</h2>
                         <p class="card-text">{{$latestPost->description}}</p>
                         <a href="{{route('blogposts',$latestPost->id)}}" class="btn primaryBtn">Read more →</a>
@@ -58,7 +49,7 @@
                             <div class="card mb-4">
                                 <a href="#!"><img class="card-img-top" src="{{asset($post->image)}}" width="700px" height="350px" alt="..." /></a>
                                 <div class="card-body">
-                                    <div class="small text-muted">{{$post->created_at}}</div>
+                                    <div class="small text-muted">{{$post->created_at->diffForHumans()}}</div>
                                     <h2 class="card-title h4">{{$post->title}}</h2>
                                     <p class="card-text text-truncate" style="max-width: 200px; ">{{$post->description}}</p>
                                     <a class="btn primaryBtn" href="{{route('blogposts',$post->id)}}">Read more →</a>
@@ -137,10 +128,13 @@
             <div class="card mb-4">
                 <div class="card-header">Search</div>
                 <div class="card-body">
-                    <div class="input-group">
-                        <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                        <button class="btn primaryBtn" id="button-search" type="button">Go!</button>
-                    </div>
+                    <form action="{{route('search')}}" method="post">
+                        @csrf
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Enter search term..." name="search" aria-label="Enter search term..." aria-describedby="button-search" />
+                            <button class="btn primaryBtn" id="button-search" type="submit">Go!</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <!-- Categories widget-->

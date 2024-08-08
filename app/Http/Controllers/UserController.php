@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
-use App\Models\Comment;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -13,14 +12,45 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Models\EmailVerificationToken;
-use Illuminate\Support\Facades\Session;
+
 
 class UserController extends Controller
 {
 
+    // All bloggers
+    public function bloggers(){
+        $posts = Post::with('user')->get();
+        $bloggers = User::withCount('followers')->where('role','blogger')->get();
+        return view('Home.bloggers',compact('bloggers','posts')); 
+    }
+
+    public function allblogs(){
+        if(Auth::guest()){
+            $categories = Category::all();
+            $latestPost = Post::orderBy('created_at', 'desc')->take(4)->get();
+            $posts = Post::with('user','category')->paginate(4);
+            return view('Home.allblogs',compact(['posts','latestPost','categories']));
+        }else{
+
+            if(!Auth::user()->role == 'user'){
+                if(Auth::user()->role == "blogger"){
+                    return redirect()->route('dashboard');
+                }
+                return redirect()->route('admindashboard'); 
+            }else{
+                $categories = Category::all();
+                $latestPost = Post::orderBy('created_at', 'desc')->take(4)->get();
+                $posts = Post::with('user','category')->paginate(4);
+                return view('Home.allblogs',compact(['posts','latestPost','categories']));
+            }
+
+        }
+    }
+
+
     public function editUserPage($id){
         $user = User::findOrFail($id);
-        return view('edituser',compact('user'));
+        return view('admin/edituser',compact('user'));
     }
 
 
@@ -111,7 +141,10 @@ class UserController extends Controller
                 // return $posts;
                 return view('Home.postblog',compact(['posts','categories']));
             }else{
-                return redirect()->route('dashboard');
+                if(Auth::user()->role == "blogger"){
+                    return redirect()->route('dashboard');
+                }
+                return redirect()->route('admindashboard'); 
             }
         }
     }
@@ -126,7 +159,10 @@ class UserController extends Controller
             if(Auth::user()->role === 'user'){
                 return view('Home.homepage');
             }else{
-                return redirect()->route('dashboard');
+                if(Auth::user()->role == "blogger"){
+                    return redirect()->route('dashboard');
+                }
+                return redirect()->route('admindashboard'); 
             }
         }
      }
@@ -140,15 +176,22 @@ class UserController extends Controller
             if(Auth::user()->role === 'user'){
                 return view('Home.homepage');
             }else{
-                return redirect()->route('dashboard');
+                if(Auth::user()->role == "blogger"){
+                    return redirect()->route('dashboard');
+                }
+                return redirect()->route('admindashboard'); 
             }
         }
          
      }
      // Show dashboard form
      public function dashboardPage()
-     {
-         return view('dashboard');
+     {  
+        if(Auth::user()->role == "blogger"){
+            return view('blogger/dashboard');
+        }else{
+            return view('admin/dashboard');
+        }
      }
      // Show dashboard form
      public function showAllUsersPage()
@@ -156,11 +199,11 @@ class UserController extends Controller
         if(Auth::guest()){
             return view('login');
         }else{
-            if(Auth::user()->role == 'vendor'){
+            if(Auth::user()->role == 'blogger'){
                 return redirect()->route('dashboard');
             }else{
                 $users  = User::where('id','!=',Auth::user()->id)->paginate(5);
-                return view('allusers',compact('users'));
+                return view('admin/allusers',compact('users'));
             }
         }
 
@@ -173,7 +216,7 @@ class UserController extends Controller
             return view('login');
         }else{
 
-            if(Auth::user()->role == 'vendor'){
+            if(Auth::user()->role == 'blogger'){
                 return redirect()->route('dashboard');
             }else{
                 $user = User::find($id);
@@ -190,30 +233,34 @@ class UserController extends Controller
      // Show addPostPage form
      public function addPostPage()
      {  
-        $categories = Category::all();
-         return view('addpost',compact('categories'));
+         $categories = Category::all();
+        if(Auth::user()->role == 'blogger'){
+            return view('blogger/addpost',compact('categories'));
+         }else{
+            return view('admin/addpost',compact('categories'));
+         }
      }
      // Show showCategoriesPage
      public function showCategoriesPage()
      {  
-        if(Auth::user()->role == 'vendor'){
+        if(Auth::user()->role == 'blogger'){
             return redirect()->route('dashboard');
         }
         $categories = Category::all();
-         return view('categories',compact('categories'));
+         return view('admin/categories',compact('categories'));
      }
    
      public function showAddCategoryPage()
      {  
-        if(Auth::user()->role == 'vendor'){
+        if(Auth::user()->role == 'blogger'){
             return redirect()->route('dashboard');
         }
-        return view('addcategory');
+        return view('admin/addcategory');
      }
      // Show showAddCategoryPage
      public function addcategory(Request $request)
      {
-        if(Auth::user()->role == 'vendor'){
+        if(Auth::user()->role == 'blogger'){
             return redirect()->route('dashboard');
         }
         $request->validate([
@@ -229,7 +276,7 @@ class UserController extends Controller
 
     //  Delete Category
     public function destroyCategory($id){
-        if(Auth::user()->role == 'vendor'){
+        if(Auth::user()->role == 'blogger'){
             return redirect()->route('dashboard');
         }
         $category = Category::find($id);
@@ -239,32 +286,59 @@ class UserController extends Controller
      // Show allPostsPage form
      public function allPostsPage()
      {
-         return view('allposts');
+        if(Auth::user()->role == "blogger"){
+            $posts = Post::where('user_id', Auth::user()->id)->get();
+            return view('blogger/allposts',compact('posts'));
+        }else{
+            $posts = Post::all();
+            return view('admin/allposts',compact('posts'));
+        }
      }
      // Show deletePostPage form
      public function deletePostPage()
      {
-        if(Auth::user()->role == 'vendor'){
+        if(Auth::user()->role == 'blogger'){
             return redirect()->route('dashboard');
         }
-         return view('deletebyid');
+         return view('admin/deletebyid');
      }
      // Show updatePostPage form
      public function updatePostPage()
-     {
-         return view('updatepost');
+     {  
+        if(Auth::user()->role == "blogger"){
+            return view('blogger/updatepost');
+        }else{
+            return view('admin/updatepost');
+        }
      }
      // Show Upate post by Id form
      public function updateById()
      {
-        $categories = Category::all();
-         return view('updateById',compact('categories'));
+        if(Auth::user()->role == 'blogger'){
+            $categories = Category::all();
+            return view('blogger/updateById',compact('categories'));
+        }else{
+            $categories = Category::all();
+            return view('admin/updateById',compact('categories'));
+        }
      }
  
      // Show viewPostPage form
-     public function viewPostPage()
+     public function viewPostPage($id)
      {
-         return view('viewpost');
+
+        $post = Post::with('user','comment.user','comment.replies.user')->find($id);
+        if(Auth::user()->role == "blogger"){
+            return view('blogger/viewpost', compact('post'));
+        }else{
+            return view('admin/viewpost', compact('post'));
+        }
+
+        // if(Auth::user()->role == "blogger"){
+        //     return view('blogger/viewpost');
+        // }else{
+        //     return view('admin/viewpost');
+        // }
      }
  
      // Handle registration form submission
@@ -331,12 +405,15 @@ class UserController extends Controller
         if (Auth::attempt($credentials)) {
           
             $user = User::where('email', $request->email)->first();
-            if ($user && $user->email_verified_at !== null) {
+            if ($user && $user->email_verified_at != null) {
                 if(Auth::user()->role == 'user'){
                     // return redirect()->intende;
                     return redirect()->route('homepage');
                 }else{
-                    return redirect()->route('dashboard');
+                    if(Auth::user()->role == 'blogger'){
+                        return redirect()->route('dashboard');
+                    }
+                    return redirect()->route('admindashboard');
                 }
             } else {
                 Auth::logout();

@@ -83,7 +83,7 @@
                                         <td>{{$reply->user->name}}</td>
                                         @if (Auth::user()->role == 'admin')
                                             <td class="text-center">
-                                                <form action="{{route('deleteComment',$reply->id)}}" method="post">
+                                                <form action="{{route('deleteReplies',$reply->id)}}" method="post">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">Delete</button>

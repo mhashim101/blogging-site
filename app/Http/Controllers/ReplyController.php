@@ -25,6 +25,9 @@ class ReplyController extends Controller
         ]);
 
         if ($replies) {
+            if(Auth::user()->role == "vendor" || Auth::user()->role == "admin"){
+                return redirect()->back();
+            }
             return redirect()->route('blogposts',$request->post_id);
         }else{
             return redirect()->back()->with('error', 'Reply could not be added.');
@@ -35,6 +38,12 @@ class ReplyController extends Controller
 
     public function show($id){
         $repliesOfSpecifiedComment = Reply::with('user')->where('comment_id',$id)->get();
-        return view('replies',['replies' => $repliesOfSpecifiedComment]);
+        return view('admin/replies',['replies' => $repliesOfSpecifiedComment]);
+    }
+
+    public function destroy($id){
+        $reply = Reply::find($id);
+        $reply->delete();
+        return redirect()->back()->with('success','Reply Successfully Deleted');
     }
 }

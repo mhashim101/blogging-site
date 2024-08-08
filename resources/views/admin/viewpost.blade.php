@@ -176,7 +176,7 @@
                                                                 <div id="comment-{{$comment->id}}">
                                                                     <div class="comment-user">
                                                                         {{$comment->user->name}}
-                                                                        @if($comment->user->role == 'vendor')
+                                                                        @if($comment->user->role == 'blogger')
                                                                         <span class="text-secondary" style="font-size: 12px;">author</span>
                                                                         @endif
                                                                     </div>

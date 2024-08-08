@@ -38,7 +38,7 @@ class CommentController extends Controller
     public function showComments(){
         $comments = Comment::with('user','post','replies')->get();
         // return $comments;
-        return view('comments',compact('comments'));
+        return view('admin/comments',compact('comments'));
     }
 
     public function update(Request $request){

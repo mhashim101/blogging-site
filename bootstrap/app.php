@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->appendToGroup('ok-user',[
             ValidUser::class,
-            NotLoggedIn::class,
+            // NotLoggedIn::class,
             EnsureEmailIsVerified::class,
         ]);
     })

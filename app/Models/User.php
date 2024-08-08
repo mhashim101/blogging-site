@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable 
 {
@@ -58,5 +60,26 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Users whom this user is following
+    // public function following():BelongsToMany
+    // {
+    //     return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id');
+    // }
+
+
+    public function followers():BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id');
+    }
+
+
+    // Check if the user is following another user
+    public function isFollowing($user)
+    {   
+        if(Auth::check()){
+            return $this->followers->contains($user->id);
+        }
     }
 }

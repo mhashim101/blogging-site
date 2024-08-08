@@ -6,10 +6,18 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>Blog Home - Start Bootstrap Template</title>
+        {{-- Bootstrap --}}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{asset('css/style.css')}}">
-        {{-- JQuery --}}
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        {{-- Owl Carousels --}}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        {{-- Another Link of Owl Carousel --}}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+           {{-- Custom CSS --}}
+         <link rel="stylesheet" href="{{asset('css/style.css')}}">
+         {{-- Custom CSS end --}}
         <style>
             a{
                 color: #1A5319;
@@ -20,14 +28,16 @@
         <!-- Responsive navbar-->
         <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1A5319;">
             <div class="container">
-                <a class="navbar-brand" href="#!">Hashim Blogs</a>
+                <a class="navbar-brand" href="{{route('homepage')}}">Hashim Blogs</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex justify-content-center align-items-center">
                         {{-- @yield('active_home') --}}
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('homepage')}}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('allblogs')}}">All Blogs</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('bloggers')}}">Bloggers</a></li>
                         @if(Auth::guest())
-                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('registerPage')}}">Sign Up</a></li>
+                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{route('loginPage')}}">Login</a></li>
                         @elseif (Auth::user()->role == 'user')
                             <li class="nav-item">
                                 <div class="dropdown">
@@ -55,8 +65,6 @@
             <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
         </footer>
         <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>       
     </body>
 </html>

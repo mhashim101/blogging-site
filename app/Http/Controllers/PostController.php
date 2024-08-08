@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Reply;
 use App\Models\Comment;
 use App\Models\Category;
@@ -19,12 +21,12 @@ class PostController extends Controller
     public function index()
     {   
         $user = Auth::user();
-        if($user->role == 'vendor'){
-            $post = Post::with('user')->where('user_id',$user->id)->get();
-            return view('allposts',['post'=>$post]);
+        if($user->role == 'blogger'){
+            $posts = Post::with('user')->where('user_id',$user->id)->get();
+            return view('blogger/allposts',compact('posts'));
         }else{
-            $post = Post::with('user')->paginate(4);
-            return view('allposts',['post'=>$post]);
+            $posts = Post::with('user')->get();
+            return view('admin/allposts',compact('posts'));
         }
         
     }
@@ -34,7 +36,11 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('addpost');
+        if(Auth::user()->role == "blogger"){
+            return view('blogger/addpost');
+        }else{
+            return view('admin/addpost');
+        }
     }
 
     /**
@@ -64,8 +70,13 @@ class PostController extends Controller
         }
         // return gettype($request->user_id);
         // $user_id = (int) $request->user_id;
+       
+
+        // return view('post.show', compact('post', 'timeElapsed'));
         if(Auth::check()){
             // $user_id = Auth::user()->id;
+             $currentTime = Carbon::now();
+        
             $post = Post::create([
                 'title' => $request->title,
                 'description' => $request->description,
@@ -73,6 +84,7 @@ class PostController extends Controller
                 'category_id' => $request->category_id,
                 'image' => $imagePath,
             ]);
+            $post->created_at->diffForHumans($currentTime);
         }
 
         if ($post) {
@@ -90,7 +102,11 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::with('user','comment.user','comment.replies.user')->find($id);
-        return view('viewpost', compact('post'));
+        if(Auth::user()->role == "blogger"){
+            return view('blogger/viewpost', compact('post'));
+        }else{
+            return view('admin/viewpost', compact('post'));
+        }
         // return $post;
     }
 
@@ -101,7 +117,11 @@ class PostController extends Controller
     {
         $categories = Category::all();
         $post = Post::with('user','category')->find($id);
-        return view('updatepost',compact(['post','categories']));
+        if(Auth::user()->role == "blogger"){
+            return view('blogger/updatepost',compact(['post','categories']));
+        }else{
+            return view('admin/updatepost',compact(['post','categories']));
+        }
     }
 
     /**
@@ -171,7 +191,7 @@ class PostController extends Controller
         $categories = Category::all();
         $post = Post::where('user_id',$id)->find($request->id);
         // dd($post,$categories);
-        return view('updateById',compact(['post','categories']));
+        return view('admin/updateById',compact(['post','categories']));
     }
 
     public function showPostOnDelete(Request $request){
@@ -182,7 +202,7 @@ class PostController extends Controller
         $post = Post::where('user_id',$id)->find($request->id);
         // return $post;
         if(isset($post)){
-            return view('deletebyid',['post'=>$post]);
+            return view('admin/deletebyid',['post'=>$post]);
         }else{
             return redirect()->route('updateById')->with('error', 'Post not found.');
         }
@@ -199,21 +219,26 @@ class PostController extends Controller
         return redirect()->route('post.index')->with('success','Post Successfully Deleted!');
     }
 
-    // Like Function
-    // public function toggleLike(Post $post)
-    // {
-    //     $user = auth()->user();
-        
-    //     if ($post->like()->where('user_id', $user->id)->exists()) {
-    //         $post->like()->where('user_id', $user->id)->delete();
-    //         $message = 'Post unliked successfully.';
-    //     } else {
-    //         $post->like()->create(['user_id' => $user->id]);
-    //         $message = 'Post liked successfully.';
-    //     }
-        
-    //     return response()->json(['message' => $message]);
-    // }
+//   Search Function
 
+    public function search(Request $request){
+        $query = $request->search;
+        if($query == null ||  $query == ""){
+            return redirect()->back();
+        }
+        $searchResults = Post::with('user','category')->where("title","like","%{$query}%")
+                        ->orWhere("description","like","%{$query}%")
+                        ->get();
+        return view('Home.search',compact('searchResults'));
+      
+    }
+
+
+    // bloggers posts
+    public function bloggerposts($id){
+        $user = User::find($id);
+        $posts = Post::with('user')->where('user_id',$id)->get();
+        return view('Home.bloggerposts',compact('posts','user'));
+    }
 
 }

@@ -55,7 +55,7 @@
                             <label for="userRole" class="form-label">Role</label>
                             <select class="form-select shadow p-3 bg-body rounded" id="usreRole" aria-label="Default select example" name="role">
                                 <option {{$user->role == 'admin' ? 'SELECTED' : ''}} value="admin">Admin</option>
-                                <option {{$user->role == 'vendor' ? 'SELECTED' : ''}} value="vendor">Vendor</option>
+                                <option {{$user->role == 'blogger' ? 'SELECTED' : ''}} value="blogger">Blogger</option>
                                 <option {{$user->role == 'user' ? 'SELECTED' : ''}} value="user">User</option>
                               </select>
                         </div>

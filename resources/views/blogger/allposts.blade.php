@@ -78,7 +78,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($post as $userPost)
+                                @forelse ($posts as $userPost)
                                     <tr>
                                         <td>{{$userPost->id}}</td>
                                         <td>{{$userPost->title}}</td>
@@ -98,7 +98,8 @@
                                             <span>{{$userPost->user->name}} <br> {{$userPost->user->role}}</span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{route('post.show',$userPost->id)}}" class="btn btn-success d-inline-block btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mb-2 mx-2">View</a>
+                                            {{-- {{$userPost->id}} --}}
+                                            <a href="{{route('viewpost',$userPost->id)}}" class="btn btn-success d-inline-block btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mb-2 mx-2">View</a>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{route('post.edit',$userPost->id)}}" class="btn btn-warning btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mb-2 mx-2">Edit</a>

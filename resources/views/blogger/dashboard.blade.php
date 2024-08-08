@@ -10,7 +10,7 @@
         <div class="row px-0 mx-0" style="background-color: #D6EFD8; height: 100vh;">
             <div class="col-12 p-4">
                 <div class="row d-flex justify-content-around justify-content-sm-around align-items-center">
-                    @if (Auth::user()->role == 'admin')
+                    {{-- @if (Auth::user()->role == 'admin')
                         <div class="col-lg-2 col-md-2 col-sm-5 dash-box mb-4">
                             <a href="{{route('post.index')}}" class="text-decoration-none" style="color: #D6EFD8;">
                                 <div class="row">
@@ -59,7 +59,7 @@
                                 </div>
                             </a>
                         </div>
-                    @else
+                    @else --}}
                         <div class="col-md-2 col-sm-3 dash-box mb-4">
                             <a href="{{route('post.index')}}" class="text-decoration-none" style="color: #D6EFD8;">
                                 <div class="row">
@@ -96,7 +96,7 @@
                                 </div>
                             </a>
                         </div>
-                    @endif
+                    {{-- @endif --}}
                     
                 </div>
             </div>
