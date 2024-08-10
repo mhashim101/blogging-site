@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ValidUser;
+use App\Http\Middleware\IsValidUser;
 use App\Http\Middleware\NotLoggedIn;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\EnsureEmailIsVerified;
@@ -14,10 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'CheckRole' => IsValidUser::class,
+        ]);
         $middleware->appendToGroup('ok-user',[
-            ValidUser::class,
-            // NotLoggedIn::class,
             EnsureEmailIsVerified::class,
+            NotLoggedIn::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

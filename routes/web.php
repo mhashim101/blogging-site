@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\Home;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
@@ -20,7 +21,7 @@ Route::get('/emails/verify/{token}', [EmailVerificationController::class, 'verif
 
 
 // UserController
-Route::middleware(['ok-user'])->group(function(){
+Route::middleware(['ok-user','CheckRole:blogger'])->group(function(){
 
     Route::controller(UserController::class)->group(function(){
 
@@ -36,7 +37,9 @@ Route::middleware(['ok-user'])->group(function(){
         }); 
 
     });
+});
 
+Route::middleware(['ok-user','CheckRole:admin'])->group(function(){
 
     //User Controller
     Route::controller(UserController::class)->group(function(){
@@ -69,6 +72,7 @@ Route::middleware(['ok-user'])->group(function(){
         Route::get('/showPostById','showPostById')->name('showPostById');
         Route::get('/showPostOnDelete','showPostOnDelete')->name('showPostOnDelete');
         Route::delete('/destroyById','destroyById')->name('destroyById');
+        Route::post('/search','search')->name('search');
         Route::resource('post', PostController::class);
         
     });
@@ -111,22 +115,25 @@ Route::middleware(['ok-user'])->group(function(){
 
 
 
+// Route::middleware([Home::class])->group(function(){
 
 // UserController
-Route::controller(UserController::class)->group(function(){
+    Route::controller(UserController::class)->group(function(){
 
-    Route::get('/','showLoginForm')->name('loginPage');
-    Route::get('/homepage','showHomePage')->name('homepage');
-    Route::get('/blogposts/{id}','showBlogPosts')->name('blogposts');
-    Route::get('/register','showRegistrationForm')->name('registerPage');
-    Route::post('/registerUser','register')->name('registerUser');
-    Route::post('/loginMatch','login')->name('loginMatch');
-    Route::get('/logoutUser','logout')->name('logoutUser');
-    Route::get('/postbycategory/{name}','postByCategory')->name('postByCategory');
+        Route::get('/','showLoginForm')->name('loginPage');
+        Route::get('/homepage','showHomePage')->name('homepage');
+        Route::get('/blogposts/{id}','showBlogPosts')->name('blogposts');
+        Route::get('/register','showRegistrationForm')->name('registerPage');
+        Route::post('/registerUser','register')->name('registerUser');
+        Route::post('/loginMatch','login')->name('loginMatch');
+        Route::get('/logoutUser','logout')->name('logoutUser');
+        Route::get('/postbycategory/{name}','postByCategory')->name('postByCategory');
+        Route::get('/allblogs','allblogs')->name('allblogs');
+        Route::get('/bloggers','bloggers')->name('bloggers');
 
-});
+    });
 
-
+// });
 
 
 // GoogleController

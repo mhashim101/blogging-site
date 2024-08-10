@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class NotLoggedIn
+class Home
 {
     /**
      * Handle an incoming request.
@@ -17,8 +17,16 @@ class NotLoggedIn
     public function handle(Request $request, Closure $next): Response
     {
         if(Auth::guest()){
-            return redirect()->route('loginPage');
+            return $next($request);         
+        }else{
+            $role = Auth::user()->role;
+            if($role == 'admin'){
+                return redirect()->route('admindashboard');
+            }elseif($role == 'blogger'){
+                return redirect()->route('dashboard');
+            }else{
+                return redirect()->route('homepage');
+            }
         }
-        return $next($request);
     }
 }

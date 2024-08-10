@@ -96,6 +96,18 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-lg-2 col-md-2 col-sm-5 dash-box mb-4">
+                            <a href="{{route('deletebyid')}}" class="text-decoration-none" style="color: #D6EFD8;">
+                                <div class="row">
+                                    <div class="col-12 d-flex flex-row justify-content-center align-items-center">
+                                        <img src="{{asset('img/icons8-delete-100.png')}}" width="100px" alt="">
+                                    </div>
+                                    <div class="col-12 d-flex flex-row justify-content-center align-items-center">
+                                        <span>Delete Post</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     {{-- @endif --}}
                     
                 </div>
