@@ -6,8 +6,10 @@ use Carbon\Carbon;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Notifications\BlogPosted;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Notification;
 
 class PostController extends Controller
 {
@@ -69,6 +71,9 @@ class PostController extends Controller
             ]);
             $post->created_at->diffForHumans($currentTime);
         }
+
+        $followers = Auth::user()->followers;
+        Notification::send($followers, new BlogPosted($post));
 
         if ($post) {
             return redirect()->route('post.index',$post->id)->with('success', 'Successful Posted!');
