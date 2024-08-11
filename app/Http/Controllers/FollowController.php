@@ -23,8 +23,4 @@ class FollowController extends Controller
         $user->followers()->detach($user_id);
         return redirect()->back();
     }
-
-    // public function showFollowers(){
-
-    // }
 }

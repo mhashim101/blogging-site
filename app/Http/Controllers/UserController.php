@@ -16,38 +16,6 @@ use App\Models\EmailVerificationToken;
 
 class UserController extends Controller
 {
-
-    // All bloggers
-    public function bloggers(){
-        $posts = Post::with('user')->get();
-        $bloggers = User::withCount('followers')->where('role','blogger')->get();
-        return view('Home.bloggers',compact('bloggers','posts')); 
-    }
-
-    public function allblogs(){
-        if(Auth::guest()){
-            $categories = Category::all();
-            $latestPost = Post::orderBy('created_at', 'desc')->take(4)->get();
-            $posts = Post::with('user','category')->paginate(4);
-            return view('Home.allblogs',compact(['posts','latestPost','categories']));
-        }else{
-
-            if(!Auth::user()->role == 'user'){
-                if(Auth::user()->role == "blogger"){
-                    return redirect()->route('dashboard');
-                }
-                return redirect()->route('admindashboard'); 
-            }else{
-                $categories = Category::all();
-                $latestPost = Post::orderBy('created_at', 'desc')->take(4)->get();
-                $posts = Post::with('user','category')->paginate(4);
-                return view('Home.allblogs',compact(['posts','latestPost','categories']));
-            }
-
-        }
-    }
-
-
     public function editUserPage($id){
         $user = User::findOrFail($id);
         return view('admin/edituser',compact('user'));
@@ -93,7 +61,6 @@ class UserController extends Controller
             'role' => 'required|string|max:255',
         ]);
     
-        // Assuming user_id is passed through a hidden field or another way
         $user = User::find($request->user_id);
         $user->role = $request->role;
         $user->save();
@@ -107,84 +74,9 @@ class UserController extends Controller
         return view('Home.postcategory',['posts' => $postByCategory,'categories' => $categories]);
     }
 
-    // Homepage of site
-    public function showHomePage(){
-        if(Auth::guest()){
-            $categories = Category::all();
-            $latestPost = Post::orderBy('created_at', 'desc')->first();
-            $posts = Post::with('user','category')->paginate(4);
-            return view('Home.homepage',compact(['posts','latestPost','categories']));
-        }else{
-
-            if(!Auth::user()->role == 'user'){
-                return redirect()->route('dashboard');
-            }else{
-                $categories = Category::all();
-                $latestPost = Post::orderBy('created_at', 'desc')->first();
-                $posts = Post::with('user','category')->paginate(4);
-                return view('Home.homepage',compact(['posts','latestPost','categories']));
-            }
-
-        }
-    }
    
 
-    public function showBlogPosts($id){
-        if(Auth::guest()){
-            $categories = Category::all();
-            $posts = Post::with('user','category','comment.user','comment.replies.user','like')->find($id);
-            return view('Home.postblog',compact(['posts','categories']));
-        }else{
-            if(Auth::user()->role == 'user'){
-                $categories = Category::all();
-                $posts = Post::with('user','category','comment.user','comment.replies.user')->find($id);
-                // return $posts;
-                return view('Home.postblog',compact(['posts','categories']));
-            }else{
-                if(Auth::user()->role == "blogger"){
-                    return redirect()->route('dashboard');
-                }
-                return redirect()->route('admindashboard'); 
-            }
-        }
-    }
-
-
-     // Show registration form
-     public function showRegistrationForm()
-     {  
-        if(Auth::guest()){
-            return view('register');
-        }else{
-            if(Auth::user()->role === 'user'){
-                return view('Home.homepage');
-            }else{
-                if(Auth::user()->role == "blogger"){
-                    return redirect()->route('dashboard');
-                }
-                return redirect()->route('admindashboard'); 
-            }
-        }
-     }
-
-     // Show login form
-     public function showLoginForm()
-     {
-        if(Auth::guest()){
-            return view('login');
-        }else{
-            if(Auth::user()->role === 'user'){
-                return view('Home.homepage');
-            }else{
-                if(Auth::user()->role == "blogger"){
-                    return redirect()->route('dashboard');
-                }
-                return redirect()->route('admindashboard'); 
-            }
-        }
-         
-     }
-     // Show dashboard form
+     
      public function dashboardPage()
      {  
         if(Auth::user()->role == "blogger"){
@@ -193,7 +85,7 @@ class UserController extends Controller
             return view('admin/dashboard');
         }
      }
-     // Show dashboard form
+
      public function showAllUsersPage()
      {
         if(Auth::guest()){
@@ -230,7 +122,7 @@ class UserController extends Controller
         }
        
      }
-     // Show addPostPage form
+
      public function addPostPage()
      {  
          $categories = Category::all();
@@ -240,7 +132,7 @@ class UserController extends Controller
             return view('admin/addpost',compact('categories'));
          }
      }
-     // Show showCategoriesPage
+
      public function showCategoriesPage()
      {  
         if(Auth::user()->role == 'blogger'){
@@ -257,7 +149,7 @@ class UserController extends Controller
         }
         return view('admin/addcategory');
      }
-     // Show showAddCategoryPage
+
      public function addcategory(Request $request)
      {
         if(Auth::user()->role == 'blogger'){
@@ -274,7 +166,7 @@ class UserController extends Controller
         }
      }
 
-    //  Delete Category
+
     public function destroyCategory($id){
         if(Auth::user()->role == 'blogger'){
             return redirect()->route('dashboard');
@@ -283,7 +175,7 @@ class UserController extends Controller
         $category->delete();
         return redirect()->route('categories')->with('success','Post Successfully Deleted!');
     }
-     // Show allPostsPage form
+
      public function allPostsPage()
      {
         if(Auth::user()->role == "blogger"){
@@ -294,7 +186,7 @@ class UserController extends Controller
             return view('admin/allposts',compact('posts'));
         }
      }
-     // Show deletePostPage form
+ 
      public function deletePostPage()
      {
         if(Auth::user()->role == 'blogger'){
@@ -302,7 +194,7 @@ class UserController extends Controller
         }
          return view('admin/deletebyid');
      }
-     // Show updatePostPage form
+
      public function updatePostPage()
      {  
         if(Auth::user()->role == "blogger"){
@@ -311,7 +203,7 @@ class UserController extends Controller
             return view('admin/updatepost');
         }
      }
-     // Show Upate post by Id form
+
      public function updateById()
      {
         if(Auth::user()->role == 'blogger'){
@@ -323,7 +215,7 @@ class UserController extends Controller
         }
      }
  
-     // Show viewPostPage form
+
      public function viewPostPage($id)
      {
 
@@ -334,17 +226,12 @@ class UserController extends Controller
             return view('admin/viewpost', compact('post'));
         }
 
-        // if(Auth::user()->role == "blogger"){
-        //     return view('blogger/viewpost');
-        // }else{
-        //     return view('admin/viewpost');
-        // }
      }
  
-     // Handle registration form submission
+
      public function register(Request $request)
      {
-         // Validate the form data
+ 
          $request->validate([
              'name' => 'required|string|max:255',
              'email' => 'required|string|email|max:255|unique:users',
@@ -356,11 +243,11 @@ class UserController extends Controller
          if ($request->hasFile('profile')) {
             $image = $request->file('profile');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('img'), $imageName); // Move the image to public/img directory
-            $imagePath = 'img/' . $imageName; // Relative path to store in the database
+            $image->move(public_path('img'), $imageName); 
+            $imagePath = 'img/' . $imageName; 
         }
 
-         // Create a new user record
+   
          $user = User::create([
              'name' => $request->name,
              'email' => $request->email,
@@ -379,7 +266,6 @@ class UserController extends Controller
             return redirect()->route('loginPage')->with('message', 'Please check your email! we have sent you an email verification link to verify you.');
 
         } else {
-            // Handle registration failure if necessary
             return redirect()->back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
         }
          
@@ -407,7 +293,6 @@ class UserController extends Controller
             $user = User::where('email', $request->email)->first();
             if ($user && $user->email_verified_at != null) {
                 if(Auth::user()->role == 'user'){
-                    // return redirect()->intende;
                     return redirect()->route('homepage');
                 }else{
                     if(Auth::user()->role == 'blogger'){
@@ -430,7 +315,7 @@ class UserController extends Controller
     }
 
 
-    // Logout method
+
     public function logout(Request $request)
     {
         if(!Auth::user()->role == 'user'){

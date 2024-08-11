@@ -41,8 +41,9 @@
                         @elseif (Auth::user()->role == 'user')
                             <li class="nav-item">
                                 <div class="dropdown">
-                                    <button style="border: none;background-color: unset;color: white;" class="dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button style="border: none;background-color: unset;color: white;" class="dropdown-toggle d-flex jutify-content-center align-items-center" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                       {{Auth::user()->name}}
+                                      <img src="{{asset(Auth::user()->profile)}}" alt="user profile" style="object-fit: cover; width: 40px; height: 40px;">
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li>

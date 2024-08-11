@@ -11,7 +11,6 @@ class ReplyController extends Controller
     public function storeReply(Request $request){
         $request->validate([
             'body' => 'required|string',
-            // 'user_id' => 'required|numeric',
             'comment_id' => 'required|numeric',
             'reply_id' => 'nullable',
         ]);
@@ -19,7 +18,6 @@ class ReplyController extends Controller
         $replies = Reply::create([
             'body' => $request->body,
             'user_id' => Auth::user()->id,
-            // 'post_id' => $request->post_id,
             'comment_id' => $request->comment_id,
             'reply_id' => $request->reply_id,
         ]);

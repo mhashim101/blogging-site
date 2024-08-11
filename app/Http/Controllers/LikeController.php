@@ -9,11 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    // public function index(){
-    //     $likes = Like::all();
-    //     dd($likes);
-    // }
-
+  
     public function likePost($postId){
         $post = Post::findOrFail($postId);
         $like = new Like();

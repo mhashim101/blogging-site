@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -24,6 +23,7 @@ class GoogleController extends Controller
 
         if ($findUser) {
             Auth::login($findUser);
+            return redirect()->route('homepage');
         } else {
             $newUser = User::create([
                 'name' => $googleUser->name,
@@ -33,6 +33,7 @@ class GoogleController extends Controller
             ]);
 
             Auth::login($newUser);
+            return redirect()->route('homepage');
         }
 
         return redirect()->intended('dashboard');

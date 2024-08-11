@@ -4,20 +4,14 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Post;
-use App\Models\User;
-use App\Models\Reply;
-use App\Models\Comment;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   
     public function index()
     {   
         $user = Auth::user();
@@ -31,9 +25,6 @@ class PostController extends Controller
         
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         if(Auth::user()->role == "blogger"){
@@ -43,23 +34,20 @@ class PostController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        // $description = $request->input('description');
-       
+           
        $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
             'user_id' => 'required|numeric',
             'category_id' => 'nullable',
             'comment_id' => 'nullable',
-            'image' => 'nullable|image', // Assuming 'image' is a file upload field
+            'image' => 'nullable|image', 
         ]);
         
-        // Initialize $imagePath variable
+
         $imagePath = null;
 
         if($request->hasFile('image')){
@@ -68,14 +56,9 @@ class PostController extends Controller
             $image->move(public_path('img'),$imageName);
             $imagePath = 'img/'. $imageName;
         }
-        // return gettype($request->user_id);
-        // $user_id = (int) $request->user_id;
-       
 
-        // return view('post.show', compact('post', 'timeElapsed'));
         if(Auth::check()){
-            // $user_id = Auth::user()->id;
-             $currentTime = Carbon::now();
+            $currentTime = Carbon::now();
         
             $post = Post::create([
                 'title' => $request->title,
@@ -88,17 +71,13 @@ class PostController extends Controller
         }
 
         if ($post) {
-            // Redirect to a specific route (e.g., login page) after successful registration
             return redirect()->route('post.index',$post->id)->with('success', 'Successful Posted!');
         } else {
-            // Handle registration failure if necessary
             return redirect()->back()->withInput()->withErrors(['error' => 'Your post is Unsuccessfully not posted. Please try again.']);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show($id)
     {
         $post = Post::with('user','comment.user','comment.replies.user')->find($id);
@@ -107,12 +86,9 @@ class PostController extends Controller
         }else{
             return view('admin/viewpost', compact('post'));
         }
-        // return $post;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit($id)
     {
         $categories = Category::all();
@@ -124,22 +100,18 @@ class PostController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update($postId, Request $request)
     {
-        // Validate the incoming request data
         $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required|numeric',
-            'image' => 'nullable|image', // Make image nullable since it's not always required
+            'image' => 'nullable|image', 
         ]);
         
-        // Find the post by ID
-        $post = Post::with('user')->find($postId); // Replace $postId with the actual ID of the post
-        // return $post->image;
+
+        $post = Post::with('user')->find($postId); 
         if (!$post) {
             return redirect()->back()->with('error', 'Post not found.');
         }
@@ -152,7 +124,6 @@ class PostController extends Controller
         $post->save();
 
         if ($request->hasFile('image')) {
-            // Delete the old image if it exists
            File::delete(public_path('img/'.$post->image));
 
             $image = $request->file('image');
@@ -163,13 +134,9 @@ class PostController extends Controller
             $post->save();
         }
        
-        // Redirect with success message
         return redirect()->route('post.show', $post->id)->with('success', 'Post successfully updated!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $post = Post::find($id);
@@ -181,8 +148,6 @@ class PostController extends Controller
     }
 
 
-    // Cutom Mehtod
-
     public function showPostById(Request $request){
         $request->validate([
             'id' => 'required|numeric',
@@ -190,7 +155,6 @@ class PostController extends Controller
         $id = Auth::user()->id;
         $categories = Category::all();
         $post = Post::where('user_id',$id)->find($request->id);
-        // dd($post,$categories);
         return view('admin/updateById',compact(['post','categories']));
     }
 
@@ -200,7 +164,6 @@ class PostController extends Controller
         ]);
         $id = Auth::user()->id;
         $post = Post::where('user_id',$id)->find($request->id);
-        // return $post;
         if(isset($post)){
             return view('admin/deletebyid',['post'=>$post]);
         }else{
@@ -219,26 +182,5 @@ class PostController extends Controller
         return redirect()->route('post.index')->with('success','Post Successfully Deleted!');
     }
 
-//   Search Function
-
-    public function search(Request $request){
-        $query = $request->search;
-        if($query == null ||  $query == ""){
-            return redirect()->back();
-        }
-        $searchResults = Post::with('user','category')->where("title","like","%{$query}%")
-                        ->orWhere("description","like","%{$query}%")
-                        ->get();
-        return view('Home.search',compact('searchResults'));
-      
-    }
-
-
-    // bloggers posts
-    public function bloggerposts($id){
-        $user = User::find($id);
-        $posts = Post::with('user')->where('user_id',$id)->get();
-        return view('Home.bloggerposts',compact('posts','user'));
-    }
-
+   
 }
