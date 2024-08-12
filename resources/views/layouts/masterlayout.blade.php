@@ -4,12 +4,14 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Panel - @yield('title')</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>Admin Panel - @yield('title')</title>
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
     <link rel="stylesheet" href="{{asset('css/mediaquery.css')}}">   
+    {{-- Font Icons --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
     {{-- JQuery --}}
@@ -47,6 +49,9 @@
             display: block;
             margin-top: 0; /* Remove the margin so it aligns properly */
         }
+    a.markasread:hover{
+        color: #1A5319 !important;
+    }
     </style>
   </head>
   <body class="karla-font">
@@ -432,9 +437,45 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <h4 class="mb-0">
-                                        <a href="{{route('dashboard')}}" class="text-decoration-none text-light">Home</a>
-                                    </h4>
+                                    <div class="d-flex flex-row gap-4 justify-content-center align-items-center">
+                                        <h4 class="mb-0">
+                                            <a href="{{route('dashboard')}}" class="text-decoration-none text-light">Home</a>
+                                        </h4>
+                                    {{-- notifications --}}
+                                        <div class="dropdown">
+                                            <button class="btn border border-1 text-white position-relative" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Notificatons <i class="fas fa-bell"></i>
+                                                @foreach (Auth::user()->unreadnotifications as $notification)
+                                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #1A5319;">
+                                                        {{$notification->count()}}
+                                                        <span class="visually-visible">unread messages</span>
+                                                    </span>
+                                                @endforeach
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                @forelse (Auth::user()->unreadnotifications as $notification)
+                                                    <li class="d-flex flex-row justify-content-center align-items-center" style="background-color: #508D4E;">
+                                                        <a class="dropdown-item" href="#">
+                                                            <div  class="d-flex flex-row align-items-center gap-3">
+                                                                <img src="{{asset($notification->data['follower_profile'])}}" class="rounded-circle" style="object-fit: cover; width: 50px; height: 50px;" alt="">
+                                                                <div>
+                                                                    <p class="mb-0 fw-bold" style="color: #1A5319;">{{$notification->data['follower_name']}}</p>
+                                                                    <p class="mb-0 text-white">{{$notification->data['message']}}</p>
+                                                                    <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->created_at->diffForHumans() }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                        <a href="{{route('markasread',$notification->id)}}" class="dropdown-item text-white markasread" style="background-color: #508D4E;">Mark as read</a>
+                                                    </li>
+                                                @empty
+                                                    <li>
+                                                        <p class="dropdown-item mb-0 text-muted">No unread notifications</p>
+                                                    </li>
+                                                @endforelse
+                                            </ul>
+                                        </div>
+                                        {{-- Notifications End --}}
+                                    </div>
                                     <a href="{{route('logoutUser')}}" type="button" class="btn primaryBtn btn-md">Logout</a>
                                 </div>
                             </div>

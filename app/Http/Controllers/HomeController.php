@@ -136,4 +136,10 @@ class HomeController extends Controller
         return view('Home.bloggerposts',compact('posts','user'));
     }
 
+    public function markasread($id){
+        if($id){
+            Auth::user()->unreadnotifications->where('id',$id)->markAsRead();
+        }
+        return back();
+    }
 }

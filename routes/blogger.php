@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 
 
@@ -21,4 +22,6 @@ Route::middleware(['ok-user','CheckRole:blogger'])->group(function(){
         }); 
 
     });
+
+    Route::get('/markasread/{id}',[HomeController::class,'markasread'])->name('markasread');
 });
