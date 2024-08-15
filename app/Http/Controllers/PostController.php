@@ -49,6 +49,7 @@ class PostController extends Controller
             'image' => 'nullable|image', 
         ]);
         
+        $encodedInput = htmlspecialchars($request->description);
 
         $imagePath = null;
 
@@ -64,7 +65,7 @@ class PostController extends Controller
         
             $post = Post::create([
                 'title' => $request->title,
-                'description' => $request->description,
+                'description' => $encodedInput,
                 'user_id' => Auth::id(),
                 'category_id' => $request->category_id,
                 'image' => $imagePath,

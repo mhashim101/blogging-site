@@ -65,6 +65,7 @@
                     </div>
                 @endif
                     <div class="col-lg-8 col-md-9 col-12">
+                        {{-- <div class="card mb-5" style="width: 100%; background-color: #508D4E;"> --}}
                         <div class="card mb-5" style="width: 100%; background-color: #508D4E;">
                             <div class="card-header">
                                 <div class="row py-2">
@@ -116,8 +117,9 @@
                             </div>
                             <div class="card-body text-white">
                                 <h5 class="card-title">{{ $post->title }}</h5>
-                                <p class="card-text">{{ $post->description }}</p><br>
-        
+                                <p class="card-text">{!!html_entity_decode($post->description)!!}</p><br>
+                                
+                               
                                 <p class="card-text"> <span class="text-light">Category: </span><strong
                                         class="border-2 rounded">{{ $post->category->name }}</strong></p>
                                 @if ($post->image != '')

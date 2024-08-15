@@ -27,7 +27,7 @@
                             <div class="card-body">
                                 <div class="small text-muted">{{$post->created_at->diffForHumans()}}</div>
                                 <h2 class="card-title h4">{{$post->title}}</h2>
-                                <p class="card-text text-truncate" style="max-width: 200px; ">{{$post->description}}</p>
+                                <p class="card-text text-truncate" style="max-width: 200px; ">{!!html_entity_decode($post->description)!!}</p>
                                 <a class="btn primaryBtn" href="{{route('blogposts',$post->id)}}">Read more →</a>
                             </div>
                         </div>

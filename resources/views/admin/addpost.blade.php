@@ -39,7 +39,7 @@
                         <div class="mb-3">
                             <label for="postDec" class="form-label">Post Description</label>
                             {{-- <div id="editor"></div> --}}
-                            <textarea id="my-editor" name="description" class="form-control shadow bg-body rounded" id="postDec" rows="10" columns="20"></textarea>
+                            <textarea id="mytextarea" name="description" class="form-control shadow bg-body rounded" id="postDec" rows="10" columns="20"></textarea>
 
                            
                             {{-- <textarea name="description" class="form-control" id="postDec" rows="10" columns="20"></textarea> --}}
@@ -80,8 +80,5 @@
     </div>
 </div>
 @endsection
-<script>
-tinymce.init({
-    selector: '#my-editor'
-});
-</script>
+
+

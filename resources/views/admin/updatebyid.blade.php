@@ -46,7 +46,7 @@
                 <div class="row shadow p-3 mb-5 rounded" style="background-color: #508d4e;">
 
                     @isset($post)
-                        <div class="col-md-6 col-12">
+                        <div class="col-md-12">
                             <form action="{{ route('post.update', $post->id) }}" enctype="multipart/form-data" method="post"
                                 class="addPost mb-5">
                                 @csrf
@@ -58,7 +58,9 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="postDec" class="form-label">Post Description</label>
-                                    <textarea name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20">{{ $post->description }}</textarea>
+                                    {{-- <textarea id="mytextarea" name="description" class="form-control shadow bg-body rounded" id="postDec" rows="10" columns="20"></textarea> --}}
+
+                                    <textarea id="mytextarea" name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20">{!!html_entity_decode($post->description)!!}</textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="floatingSelect" class="form-label">Categories</label>
@@ -76,6 +78,10 @@
                                     <input type="file" name="image" class="form-control shadow p-3 bg-body rounded" id="postImg">
                                 </div>
                                 <div class="mb-3">
+                                    <label for="postOldImg" class="form-label">Post Image</label>
+                                    <img src="{{ asset($post->image) }}" id="postOldImg" class="form-control" style="object-fit: cover; width: 400px; height: 400px;" alt="">
+                                </div>
+                                <div class="mb-3">
                                     <button type="submit" class="btn btn-primary btn-md primaryBtn shadow p-3 bg-body rounded"
                                         style="background-color: #1A5319;">Update</button>
                                 </div>
@@ -90,9 +96,9 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="col-sm-6 col-12">
+                        {{-- <div class="col-sm-6 col-12">
                             <img src="{{ asset($post->image) }}" class="img-fluid" alt="">
-                        </div>
+                        </div> --}}
                     @else
                         <div class="col-md-6 col-12">
                             
@@ -105,7 +111,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="postDec" class="form-label">Post Description</label>
-                                    <textarea name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20"></textarea>
+                                    <textarea id="mytextarea" name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20"></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="floatingSelect" class="form-label">Categories</label>
@@ -142,4 +148,11 @@
             </div>
         </div>
     </div>
+    <script>
+         // TinyMCE Richtext Editor
+         tinymce.init({
+          selector: '#mytextarea',
+          plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview','anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen','insertdatetime', 'media', 'table', 'help', 'wordcount'], toolbar: 'undo redo | blocks | ' + 'bold italic backcolor | alignleft aligncenter ' + 'alignright alignjustify | bullist numlist outdent indent | ' + 'removeformat | help',
+        });
+    </script>
 @endsection

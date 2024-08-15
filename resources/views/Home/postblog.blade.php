@@ -85,7 +85,7 @@
                         </figure>
                         <!-- Post content-->
                         <section class="mb-5">
-                            <p class="fs-5 mb-4">{{$posts->description}}</p>
+                            <p class="fs-5 mb-4">{!!html_entity_decode($posts->description)!!}</p>
                             {{-- {!! $posts->description !!} --}}
                         </section>
                     </article>

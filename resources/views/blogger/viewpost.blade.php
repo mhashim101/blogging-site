@@ -116,7 +116,7 @@
                             </div>
                             <div class="card-body text-white">
                                 <h5 class="card-title">{{ $post->title }}</h5>
-                                <p class="card-text">{{ $post->description }}</p><br>
+                                <p class="card-text">{!!html_entity_decode($post->description)!!}</p><br>
         
                                 <p class="card-text"> <span class="text-light">Category: </span><strong
                                         class="border-2 rounded">{{ $post->category->name }}</strong></p>

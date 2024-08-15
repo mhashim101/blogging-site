@@ -66,7 +66,7 @@
                                 <tr>
                                     <th scope="col" >S.No</th>
                                     <th scope="col" >Post Title</th>
-                                    <th scope="col" >Post Description</th>
+                                    {{-- <th scope="col" >Post Description</th> --}}
                                     <th scope="col" >Category</th>
                                     <th scope="col" class="text-center">Post Image</th>
                                     <th scope="col" class="text-center">Post By</th>
@@ -82,11 +82,11 @@
                                     <tr>
                                         <td>{{$userPost->id}}</td>
                                         <td>{{$userPost->title}}</td>
-                                        <td>
+                                        {{-- <td>
                                             <span class="d-inline-block text-truncate" style="max-width: 150px;">
-                                                {{$userPost->description}}
+                                                {!!html_entity_decode($post->description)!!}
                                             </span>
-                                        </td>
+                                        </td> --}}
                                         <td>{{$userPost->category->name}}</td>
                                         <td class="text-center">
                                             <img src="{{ asset($userPost->image) }}" width="50px" alt="">

@@ -13,7 +13,7 @@ Route::middleware(['ok-user','CheckRole:admin'])->group(function(){
                 Route::get('/addpost','addPostPage')->name('adminaddpost');
                 Route::get('/update','updatePostPage')->name('adminupdate');
                 Route::get('/allposts','allPostsPage')->name('adminallposts');
-                Route::get('/viewpost','viewPostPage')->name('adminviewpost');
+                Route::get('/viewpost/{id}','viewPostPage')->name('adminviewpost');
                 Route::get('/updateById','updateById')->name('adminupdateById');
                 Route::get('/dashboard','dashboardPage')->name('admindashboard');
                 Route::get('/allusers','showAllUsersPage')->name('allusers');

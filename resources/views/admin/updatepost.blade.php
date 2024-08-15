@@ -38,7 +38,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="postDec" class="form-label">Post Description</label>
-                            <textarea name="description" class="form-control" id="postDec" rows="10" columns="20">{{$post->description}}</textarea>
+                            <textarea id="mytextarea" name="description" class="form-control" id="postDec" rows="10" columns="20">{!!html_entity_decode($post->description)!!}</textarea>
                         </div>
                         <div class="mb-3">
                             <label for="floatingSelect" class="form-label">Categories</label>
@@ -76,4 +76,11 @@
         </div>
     </div>
 </div>
+<script>
+    // TinyMCE Richtext Editor
+    tinymce.init({
+     selector: '#mytextarea',
+     plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview','anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen','insertdatetime', 'media', 'table', 'help', 'wordcount'], toolbar: 'undo redo | blocks | ' + 'bold italic backcolor | alignleft aligncenter ' + 'alignright alignjustify | bullist numlist outdent indent | ' + 'removeformat | help',
+   });
+</script>
 @endsection

@@ -63,7 +63,7 @@
                                 <div class="mb-3">
                                     <label for="floatingSelect" class="form-label">Categories</label>
                                     <select class="form-select shadow p-3 bg-body rounded" id="floatingSelect" name="category_id"  aria-label="Floating label select example">
-                                        <option selected hidden class="shadow p-3 bg-body rounded">{{$post->category->name}}</option>
+                                        <option selected hidden class="shadow p-3 bg-body rounded">{!!html_entity_decode($post->description)!!}</option>
                                         @forelse ($categories as $category)
                                             <option value="{{$category->id}}" class="shadow p-3 bg-body rounded">{{$category->name}}</option>
                                         @empty

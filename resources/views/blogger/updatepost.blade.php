@@ -38,7 +38,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="postDec" class="form-label">Post Description</label>
-                            <textarea name="description" class="form-control" id="postDec" rows="10" columns="20">{{$post->description}}</textarea>
+                            <textarea name="description" class="form-control" id="postDec" rows="10" columns="20">{!!html_entity_decode($post->description)!!}</textarea>
                         </div>
                         <div class="mb-3">
                             <label for="floatingSelect" class="form-label">Categories</label>

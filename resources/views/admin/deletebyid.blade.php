@@ -46,7 +46,7 @@
                 <div class="row shadow p-3 mb-5 rounded" style="background-color: #508d4e;">
 
                     @isset($post)
-                        <div class="col-md-6 col-12">
+                        <div class="col-md-12">
                             <form action="" enctype="multipart/form-data" method="post"
                                 class="addPost mb-5">
                                 @csrf
@@ -56,14 +56,18 @@
                                     <input type="text" class="form-control shadow p-3 bg-body rounded" id="adminPost" name="title"
                                         value="{{ $post->title }}">
                                 </div>
-                                <div class="mb-3">
+                                {{-- <div class="mb-3">
                                     <label for="postDec" class="form-label">Post Description</label>
-                                    <textarea name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20">{{ $post->description }}</textarea>
-                                </div>
+                                    <textarea id="mytextarea" name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20">{!! html_entity_decode( $post->description) !!}</textarea>
+                                </div> --}}
                                 <div class="mb-3">
+                                    <label for="postOldImg" class="form-label">Post Image</label>
+                                    <img src="{{ asset($post->image) }}" id="postOldImg" class="form-control" style="object-fit: cover; width: 400px; height: 400px;" alt="">
+                                </div>
+                                {{-- <div class="mb-3">
                                     <label for="postImg" class="form-label">Post Title</label>
                                     <input type="file" name="image" class="form-control shadow p-3 bg-body rounded" id="postImg">
-                                </div>
+                                </div> --}}
                                 {{-- <div class="mb-3">
                                     <button type="submit" class="btn btn-primary btn-md primaryBtn"
                                         style="background-color: #1A5319;">Delete</button>
@@ -87,9 +91,9 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="col-sm-6 col-12">
+                        {{-- <div class="col-sm-6 col-12">
                             <img src="{{ asset($post->image) }}" class="img-fluid" alt="">
-                        </div>
+                        </div> --}}
                     @else
                         <div class="col-md-6 col-12">
 
@@ -101,7 +105,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="postDec" class="form-label">Post Description</label>
-                                    <textarea name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20"></textarea>
+                                    <textarea id="mytextarea" name="description" class="form-control shadow p-3 bg-body rounded" id="postDec" rows="10" columns="20"></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="postImg" class="form-label">Post Title</label>
