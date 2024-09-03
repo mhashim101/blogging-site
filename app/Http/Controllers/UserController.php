@@ -256,31 +256,17 @@ class UserController extends Controller
          ]);
          
          if ($user) {
-
-            $token = Str::random(60);
-            EmailVerificationToken::create([
-                'user_id' => $user->id,
-                'token' => $token,
-            ]);
-            $this->sendVerificationEmail($user, $token);
-            return redirect()->route('loginPage')->with('message', 'Please check your email! we have sent you an email verification link to verify you.');
-
+            return redirect()
+                ->route('loginPage')
+                ->with('message', 'Please check your email! we have sent you an email verification link to verify you.');
         } else {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Registration failed. Please try again.']);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['error' => 'Registration failed. Please try again.']);
         }
          
      }
-
-     protected function sendVerificationEmail($user, $token)
-    {
-        $verificationUrl = route('verify.email', ['token' => $token]);
-
-        Mail::send('emails.verify', ['url' => $verificationUrl], function ($message) use ($user) {
-            $message->to($user->email);
-            $message->subject('Email Verification');
-        });
-    }
-
 
      public function login(Request $request)
     {

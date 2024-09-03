@@ -42,7 +42,7 @@
                         <a href="{{ route('post.index') }}">\View Posts</a>
                         <span>\ View</span>
                     </div>
-                    <hr class="w-100" />
+                    {{-- <hr class="w-100" /> --}}
                 </div>
                 @if (session('success'))
                     <div class="alert alert-success">

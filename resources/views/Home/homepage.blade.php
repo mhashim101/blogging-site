@@ -23,7 +23,10 @@
                     <div class="card-body">
                         <div class="small text-muted">{{$latestPost->created_at->diffForHumans()}}</div>
                         <h2 class="card-title">{{$latestPost->title}}</h2>
-                        <p class="card-text">{!!html_entity_decode($latestPost->description)!!}</p>
+                        <p class="card-text text-truncate" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {!! strip_tags(html_entity_decode($latestPost->description)) !!}
+                        </p>
+                        {{-- <p class="card-text">{!!html_entity_decode($latestPost->description)!!}</p> --}}
                         <a href="{{route('blogposts',$latestPost->id)}}" class="btn primaryBtn">Read more →</a>
                     </div>
                 </div>
@@ -51,7 +54,11 @@
                                 <div class="card-body">
                                     <div class="small text-muted">{{$post->created_at->diffForHumans()}}</div>
                                     <h2 class="card-title h4">{{$post->title}}</h2>
-                                    <p class="card-text text-truncate" style="max-width: 200px; ">{!!html_entity_decode($post->description)!!}</p>
+                                    {{-- <p class="card-text text-truncate" style="max-width: 200px;">{!!html_entity_decode($post->description)!!}</p> --}}
+                                    <p class="card-text text-truncate" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {!! strip_tags(html_entity_decode($post->description)) !!}
+                                    </p>
+                                    
                                     <a class="btn primaryBtn" href="{{route('blogposts',$post->id)}}">Read more →</a>
                                 </div>
                             </div>

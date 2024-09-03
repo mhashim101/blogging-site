@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Notifications\BlogPosted;
@@ -73,9 +74,11 @@ class PostController extends Controller
             $post->created_at->diffForHumans($currentTime);
         }
 
-        $followers = Auth::user()->followers;
-        Notification::send($followers, new BlogPosted($post));
-
+            $user = Auth::user();
+        //     $followers = $user->followers; // This should be a collection
+        //     $admin = User::where('role', 'admin')->first(); // Admin user should be a single user model
+            $message = "A new blog post has been published!";
+             Notification::send($user, new BlogPosted($post, $message));
         if ($post) {
             return redirect()->route('post.index',$post->id)->with('success', 'Successful Posted!');
         } else {
@@ -146,9 +149,18 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
-        if ($post->image) {
-            File::delete(public_path('img/'.$post->image));
+
+        if ($post->image_path) {
+            $imagePath = public_path('/img/'.$post->image_path); // Adjust the path based on your storage location
+
+            if (File::exists($imagePath)) {
+                File::delete(public_path('/img/'.$post->image_path));
+            }
         }
+
+        // if ($post->image) {
+        //     File::delete(public_path('img/'.$post->image));
+        // }
         $post->delete();
         return redirect()->route('post.index')->with('success','Post Successfully Deleted!');
     }

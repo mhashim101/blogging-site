@@ -58,7 +58,11 @@
                         {{ session('error') }}
                     </div>
                 @endif
-
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="{{route('addpost')}}" class="btn primaryBtn" >Add New</a>
+                    </div>
+                </div>
                 <div class="col-12">
                     <div class="table-responsive">
                         <table id="example" style="width:100%" class="display">
@@ -104,7 +108,7 @@
                                         <td class="text-center">
                                             <a href="{{route('post.edit',$userPost->id)}}" class="btn btn-warning btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mb-2 mx-2">Edit</a>
                                         </td>
-                                        @if (Auth::user()->role == 'admin')
+                                        {{-- @if (Auth::user()->role == 'admin') --}}
                                             <td class="text-center">
                                                 <form action="{{route('post.destroy',$userPost->id)}}" method="post">
                                                     @csrf
@@ -112,7 +116,7 @@
                                                     <button type="submit" class="btn btn-danger btn-xl btn-lg btn-md btn-sm mb-md-0 mb-sm-2 mx-2">Delete</button>
                                                 </form>
                                             </td>
-                                        @endif
+                                        {{-- @endif --}}
                                     </tr>                      
                                 @empty
                                     <tr>

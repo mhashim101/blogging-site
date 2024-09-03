@@ -15,7 +15,8 @@ class FollowController extends Controller
         $follower = Auth::user();
         $blogger = User::find($bloggerId);
         $blogger->followers()->attach($follower->id);
-        Notification::send($blogger,new FollowNotification($follower));
+        $message = "You have a new follower";
+        Notification::send($blogger,new FollowNotification($follower,$message));
         return redirect()->back();
     }
 
@@ -26,4 +27,12 @@ class FollowController extends Controller
         $user->followers()->detach($user_id);
         return redirect()->back();
     }
+
+    public function show(){
+        $user_id = Auth::user()->id;
+        $user = User::find($user_id);
+        $followers = $user->followers()->orderBy('created_at','desc')->get();
+        return view('blogger.followers',compact('followers'));
+    }
+
 }

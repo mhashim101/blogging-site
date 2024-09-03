@@ -45,10 +45,13 @@
         color: #D6EFD8;
         
     }
-    .dropdown:hover .dropdown-menu {
-            display: block;
-            margin-top: 0; /* Remove the margin so it aligns properly */
+    .dropdown .dropdown-menu li:hover {
+            opacity: 1 !important;
         }
+    /* .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0; 
+        } */
     a.markasread:hover{
         color: #1A5319 !important;
     }
@@ -155,13 +158,13 @@
                                 <div class="row d-flex justify-content-center align-items-center">
                                     <div class="col-md-4 col-sm-12 text-center">
                                         
-                                        @if(Auth::check() && Auth::user()->profile)
-                                        <div class="border border-5 image-box rounded-circle">
-                                            <img src="{{ asset(Auth::user()->profile) }}" class="img-fluid" width="100%" alt="">
-                                        </div>
-                                        @else
+                                        @if(Auth::check() && (Auth::user()->profile == "" || Auth::user()->profile == null))
                                             <div class="border border-5 image-box rounded-circle">
                                                 <img src="{{ asset('img/user_default_img.png') }}" class="img-fluid" width="100%" alt="">
+                                            </div>
+                                        @else
+                                            <div class="border border-5 image-box rounded-circle">
+                                                <img src="{{ asset(Auth::user()->profile) }}" class="img-fluid" width="100%" alt="">
                                             </div>
                                         @endif
 
@@ -207,6 +210,12 @@
 
                                             <img src="{{asset('img/icons8-update-100.png')}}" alt=""> 
                                             Update Post
+                                        </a>
+                                    </li>
+                                    <li class="nav-item text-decoration-none ">
+                                        <a href="{{route('followers')}}" class="nav-link text-light">
+                                            <img src="{{asset('img/followers.png')}}" alt=""> 
+                                            Followers
                                         </a>
                                     </li>
                                     {{-- <li class="nav-item text-decoration-none ">
@@ -260,13 +269,13 @@
                                                     <div class="card card-body" style="background-color: #1A5319; width: 250px;">
                                                     <div class="row d-flex justify-content-center align-items-center">
                                                         <div class="col-md-4 col-sm-12 d-flex justify-content-center align-items-center">
-                                                            @if(Auth::check() && Auth::user()->profile)
-                                                            <div class="border border-5 image-box rounded-circle">
-                                                                <img src="{{ asset(Auth::user()->profile) }}" class="img-fluid" width="100%" alt="">
-                                                            </div>
-                                                            @else
+                                                            @if(Auth::check() && (Auth::user()->profile == "" || Auth::user()->profile == null))
                                                                 <div class="border border-5 image-box rounded-circle">
                                                                     <img src="{{ asset('img/user_default_img.png') }}" class="img-fluid" width="100%" alt="">
+                                                                </div>
+                                                            @else
+                                                                <div class="border border-5 image-box rounded-circle">
+                                                                    <img src="{{ asset(Auth::user()->profile) }}" class="img-fluid" width="100%" alt="">
                                                                 </div>
                                                             @endif
                                                         </div>
@@ -337,10 +346,75 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <h4 class="mb-0">
+                                    <div class="d-flex flex-row gap-4 justify-content-center align-items-center">
+                                        <h4 class="mb-0">
+                                            <a href="{{route('dashboard')}}" class="text-decoration-none text-light">Home</a>
+                                        </h4>
+                                        {{-- notifications --}}
+                                        <div class="dropdown">
+                                            <button class="btn border border-1 text-white position-relative" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Notifications <i class="fas fa-bell"></i>
+                                                @if(Auth::user()->notifications->count() > 0)
+                                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #1A5319;">
+                                                        {{Auth::user()->notifiactions->count() }}
+                                                        <span class="visually-hidden">unread messages</span>
+                                                    </span>
+                                                @endif
+                                            </button>
+                                        
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                {{-- {{Auth::user()->notfications}} --}}
+                                                @forelse(Auth::user()->notifications as $notification)
+                                                    @if($notification->type === 'App\Notifications\FollowNotification')
+                                                        <li class="d-flex flex-row justify-content-center align-items-center markAsRead" style="background-color: #508D4E;">
+                                                            <a class="dropdown-item" onclick="handleRedirect('{{ route('markasread', $notification->id) }}')" href="{{ route('followers') }}">
+                                                                <div class="d-flex flex-row align-items-center gap-3">
+                                                                    <img src="{{ asset($notification->data['follower_profile']) }}" class="rounded-circle" style="object-fit: cover; width: 50px; height: 50px;" alt="">
+                                                                    <div style="width: 300px;">
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->data['follower_name'] }}</p>
+                                                                        <p class="mb-0 text-white text-wrap">{{ $notification->data['message'] }}</p>
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->created_at->diffForHumans() }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                            @if(is_null($notification->read_at))
+                                                                <a href="{{ route('markasread', $notification->id) }}" class="dropdown-item text-white markasread" style="background-color: #508D4E;">Mark as read</a>
+                                                            @endif
+                                                        </li>
+                                                        <hr class="w-100 m-0 p-0"/>
+                                                    @elseif($notification->type === 'App\Notifications\BlogPosted')
+                                                        <li class="d-flex flex-row justify-content-center align-items-center" style="background-color: #508D4E;">
+                                                            <a class="dropdown-item" href="{{ route('viewpost', $notification->data['post_id']) }}">
+                                                                <div class="d-flex flex-row align-items-center gap-3">
+                                                                    <img src="{{ asset($notification->data['blogger_profile']) }}" class="rounded-circle" style="object-fit: cover; width: 50px; height: 50px;" alt="">
+                                                                    <div style="width: 300px;">
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->data['blogger_name'] }}</p>
+                                                                        <p class="mb-0 text-white text-wrap">{{ $notification->data['message'] }}</p>
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->created_at->diffForHumans() }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                            @if(is_null($notification->read_at))
+                                                                <a href="{{ route('markasread', $notification->id) }}" class="dropdown-item text-white markasread" style="background-color: #508D4E;">Mark as read</a>
+                                                            @endif
+                                                        </li>
+                                                        <hr class="w-100 m-0 p-0">
+                                                    @endif
+                                                @empty
+                                                    <li>
+                                                        <p class="dropdown-item mb-0 text-muted">No unread notifications</p>
+                                                    </li>
+                                                @endforelse
+                                            </ul>
+                                        </div>
+                                        
+                                        {{-- Notifications End --}}
+                                    </div>
+                                    <a href="{{route('logoutUser')}}" type="button" class="btn primaryBtn btn-md">Logout</a>
+                                    {{-- <h4 class="mb-0">
                                         <a href="{{route('dashboard')}}" class="text-decoration-none text-light">Home</a>
                                     </h4>
-                                    <a href="{{route('logoutUser')}}" type="button" class="btn primaryBtn btn-md">Logout</a>
+                                    <a href="{{route('logoutUser')}}" type="button" class="btn primaryBtn btn-md">Logout</a> --}}
                                 </div>
                             </div>
                         </div>
@@ -360,13 +434,13 @@
                                                     <div class="card card-body" style="background-color: #1A5319; width: 250px;">
                                                     <div class="row d-flex justify-content-center align-items-center">
                                                         <div class="col-md-4 col-sm-12 d-flex justify-content-center align-items-center">
-                                                            @if(Auth::check() && Auth::user()->profile)
-                                                            <div class="border border-5 image-box rounded-circle">
-                                                                <img src="{{ asset(Auth::user()->profile) }}" class="img-fluid" width="100%" alt="">
-                                                            </div>
-                                                            @else
+                                                            @if(Auth::check() && (Auth::user()->profile == "" || Auth::user()->profile == null))
                                                                 <div class="border border-5 image-box rounded-circle">
                                                                     <img src="{{ asset('img/user_default_img.png') }}" class="img-fluid" width="100%" alt="">
+                                                                </div>
+                                                            @else
+                                                                <div class="border border-5 image-box rounded-circle">
+                                                                    <img src="{{ asset(Auth::user()->profile) }}" class="img-fluid" width="100%" alt="">
                                                                 </div>
                                                             @endif
                                                         </div>
@@ -403,6 +477,12 @@
                                                                         <a href="{{route('updateById')}}" class="nav-link text-light">
                                                                             <img src="{{asset('img/icons8-update-100.png')}}" alt=""> 
                                                                             Update Post
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="nav-item text-decoration-none ">
+                                                                        <a href="{{route('followers')}}" class="nav-link text-light">
+                                                                            <img src="{{asset('img/followers.png')}}" alt=""> 
+                                                                            Followers
                                                                         </a>
                                                                     </li>
                                                                     {{-- <li class="nav-item text-decoration-none ">
@@ -442,38 +522,64 @@
                                             <a href="{{route('dashboard')}}" class="text-decoration-none text-light">Home</a>
                                         </h4>
                                     {{-- notifications --}}
-                                        <div class="dropdown">
-                                            <button class="btn border border-1 text-white position-relative" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Notificatons <i class="fas fa-bell"></i>
-                                                @foreach (Auth::user()->unreadnotifications as $notification)
-                                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #1A5319;">
-                                                        {{$notification->count()}}
-                                                        <span class="visually-visible">unread messages</span>
-                                                    </span>
-                                                @endforeach
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                @forelse (Auth::user()->unreadnotifications as $notification)
-                                                    <li class="d-flex flex-row justify-content-center align-items-center" style="background-color: #508D4E;">
-                                                        <a class="dropdown-item" href="#">
-                                                            <div  class="d-flex flex-row align-items-center gap-3">
-                                                                <img src="{{asset($notification->data['follower_profile'])}}" class="rounded-circle" style="object-fit: cover; width: 50px; height: 50px;" alt="">
-                                                                <div>
-                                                                    <p class="mb-0 fw-bold" style="color: #1A5319;">{{$notification->data['follower_name']}}</p>
-                                                                    <p class="mb-0 text-white">{{$notification->data['message']}}</p>
-                                                                    <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->created_at->diffForHumans() }}</p>
+                                    <div class="dropdown">
+                                        <button class="btn border border-1 text-white position-relative" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Notifications <i class="fas fa-bell"></i>
+                                            @if(Auth::user()->unreadNotifications->where('notifiable_id', Auth::user()->id)->count() > 0)
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #1A5319;">
+                                                    {{ Auth::user()->unreadNotifications->where('notifiable_id', Auth::user()->id)->count() }}
+                                                    <span class="visually-hidden">unread messages</span>
+                                                </span>
+                                            @endif
+                                        </button>
+                                        
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            @forelse (Auth::user()->notifications as $notification)
+                                                @if ($notification->notifiable_id == Auth::user()->id)
+                                                    @if($notification->type == 'App\Notifications\FollowNotification')
+                                                        <li class="d-flex flex-row justify-content-center align-items-center markAsRead" style="background-color: #508D4E;">
+                                                            <a class="dropdown-item" onclick="handleRedirect('{{ route('markasread', $notification->id) }}')" href="{{ route('followers') }}">
+                                                                <div class="d-flex flex-row align-items-center gap-3">
+                                                                    <img src="{{ asset($notification->data['follower_profile']) }}" class="rounded-circle" style="object-fit: cover; width: 50px; height: 50px;" alt="">
+                                                                    <div style="width: 300px;">
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->data['follower_name'] }}</p>
+                                                                        <p class="mb-0 text-white text-wrap">{{ $notification->data['message'] }}</p>
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->created_at->diffForHumans() }}</p>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </a>
-                                                        <a href="{{route('markasread',$notification->id)}}" class="dropdown-item text-white markasread" style="background-color: #508D4E;">Mark as read</a>
-                                                    </li>
-                                                @empty
-                                                    <li>
-                                                        <p class="dropdown-item mb-0 text-muted">No unread notifications</p>
-                                                    </li>
-                                                @endforelse
-                                            </ul>
-                                        </div>
+                                                            </a>
+                                                            @if(is_null($notification->read_at))
+                                                                <a href="{{ route('markasread', $notification->id) }}" class="dropdown-item text-white markasread" style="background-color: #508D4E;">Mark as read</a>
+                                                            @endif
+                                                        </li>
+                                                        <hr class="w-100 m-0 p-0"/>
+                                                    @elseif($notification->type == 'App\Notifications\BlogPosted')
+                                                        <li class="d-flex flex-row justify-content-center align-items-center" style="background-color: #508D4E;">
+                                                            <a class="dropdown-item" href="{{ route('viewpost', $notification->data['post_id']) }}">
+                                                                <div class="d-flex flex-row align-items-center gap-3">
+                                                                    <img src="{{ asset($notification->data['blogger_profile']) }}" class="rounded-circle" style="object-fit: cover; width: 50px; height: 50px;" alt="">
+                                                                    <div style="width: 300px;">
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->data['blogger_name'] }}</p>
+                                                                        <p class="mb-0 text-white text-wrap">{{ $notification->data['message'] }}</p>
+                                                                        <p class="mb-0 fw-bold" style="color: #1A5319;">{{ $notification->created_at->diffForHumans() }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                            @if(is_null($notification->read_at))
+                                                                <a href="{{ route('markasread', $notification->id) }}" class="dropdown-item text-white markasread" style="background-color: #508D4E;">Mark as read</a>
+                                                            @endif
+                                                        </li>
+                                                        <hr class="w-100 m-0 p-0">
+                                                    @endif
+                                                @endif
+                                            @empty
+                                                <li>
+                                                    <p class="dropdown-item mb-0 text-muted">No unread notifications</p>
+                                                </li>
+                                            @endforelse
+                                        </ul>
+                                    </div>
+                                    
                                         {{-- Notifications End --}}
                                     </div>
                                     <a href="{{route('logoutUser')}}" type="button" class="btn primaryBtn btn-md">Logout</a>
@@ -481,9 +587,9 @@
                             </div>
                         </div>
                     @endif
+                    {{-- Aside and Header for Desktop end --}}
                     
-                     {{-- Aside and Header for Desktop end --}}
-                    @yield('content')
+                     @yield('content')
                 </div>
                 {{-- Master Layout starts --}}
             </div>
@@ -500,6 +606,14 @@
           selector: '#mytextarea',
           plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview','anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen','insertdatetime', 'media', 'table', 'help', 'wordcount'], toolbar: 'undo redo | blocks | ' + 'bold italic backcolor | alignleft aligncenter ' + 'alignright alignjustify | bullist numlist outdent indent | ' + 'removeformat | help',
         });
+
+
+        function handleRedirect(id) {
+            console.log(id);
+            setTimeout(function() {
+                window.location.href = id;
+            }, 1000);
+        }
     </script>
   </body>
 </html>

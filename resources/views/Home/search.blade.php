@@ -45,7 +45,10 @@
                                 <div class="card-body">
                                     <div class="small text-muted">{{$result->created_at->diffForHumans()}}</div>
                                     <h2 class="card-title h4">{{$result->title}}</h2>
-                                    <p class="card-text text-truncate" style="max-width: 200px; ">{!!html_entity_decode($result->description)!!}</p>
+                                    {{-- <p class="card-text text-truncate" style="max-width: 200px; ">{!!html_entity_decode($result->description)!!}</p> --}}
+                                    <p class="card-text text-truncate" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {!! strip_tags(html_entity_decode($result->description)) !!}
+                                    </p>
                                     <a class="btn primaryBtn" href="{{route('blogposts',$result->id)}}">Read more →</a>
                                 </div>
                             </div>

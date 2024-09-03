@@ -80,8 +80,3 @@
     </div>
 </div>
 @endsection
-<script>
-tinymce.init({
-    selector: '#my-editor'
-});
-</script>

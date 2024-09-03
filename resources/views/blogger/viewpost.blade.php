@@ -64,6 +64,7 @@
                         </ul>
                     </div>
                 @endif
+                    
                     <div class="col-lg-8 col-md-9 col-12">
                         <div class="card mb-5" style="width: 100%; background-color: #508D4E;">
                             <div class="card-header">
